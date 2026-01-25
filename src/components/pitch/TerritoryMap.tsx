@@ -21,6 +21,7 @@ export function TerritoryMap({
   className = '',
 }: TerritoryMapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const possession = useMemo(
     () => calculatePossessionPercentage(events, homeTeamId, awayTeamId),
@@ -32,22 +33,35 @@ export function TerritoryMap({
     [events, homeTeamId, awayTeamId]
   );
 
-  // Build density grid
-  const gridCols = 24;
-  const gridRows = 16;
+  // Parse colors to RGB
+  const parseColor = (hex: string) => {
+    const h = hex.replace('#', '');
+    return {
+      r: parseInt(h.substring(0, 2), 16),
+      g: parseInt(h.substring(2, 4), 16),
+      b: parseInt(h.substring(4, 6), 16),
+    };
+  };
+
+  const homeRGB = parseColor(homeColor);
+  const awayRGB = parseColor(awayColor);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 300;
-    const height = 200;
+    // Make canvas fill container
+    const width = container.clientWidth;
+    const height = Math.min(width * 0.55, 250); // Maintain rough pitch aspect
     canvas.width = width;
     canvas.height = height;
 
+    const gridCols = 24;
+    const gridRows = 16;
     const cellWidth = width / gridCols;
     const cellHeight = height / gridRows;
 
@@ -72,7 +86,7 @@ export function TerritoryMap({
     let maxCount = 1;
     for (let r = 0; r < gridRows; r++) {
       for (let c = 0; c < gridCols; c++) {
-        maxCount = Math.max(maxCount, homeGrid[r][c], awayGrid[r][c]);
+        maxCount = Math.max(maxCount, homeGrid[r][c] + awayGrid[r][c]);
       }
     }
 
@@ -87,24 +101,25 @@ export function TerritoryMap({
           ctx.fillStyle = '#f5f5f5';
         } else {
           const homeRatio = homeVal / total;
-          const intensity = Math.min((homeVal + awayVal) / maxCount, 1) * 0.8;
+          const intensity = Math.min((total / maxCount) * 1.2, 1);
 
-          if (homeRatio > 0.5) {
-            // Home dominated - red
-            ctx.fillStyle = `rgba(239, 1, 7, ${intensity * homeRatio})`;
+          // Blend colors based on dominance
+          if (homeRatio >= 0.5) {
+            const alpha = intensity * (homeRatio - 0.5) * 2 * 0.8;
+            ctx.fillStyle = `rgba(${homeRGB.r}, ${homeRGB.g}, ${homeRGB.b}, ${alpha})`;
           } else {
-            // Away dominated - blue
-            ctx.fillStyle = `rgba(108, 171, 221, ${intensity * (1 - homeRatio)})`;
+            const alpha = intensity * (0.5 - homeRatio) * 2 * 0.8;
+            ctx.fillStyle = `rgba(${awayRGB.r}, ${awayRGB.g}, ${awayRGB.b}, ${alpha})`;
           }
         }
 
-        ctx.fillRect(c * cellWidth, r * cellHeight, cellWidth, cellHeight);
+        ctx.fillRect(c * cellWidth, r * cellHeight, cellWidth + 0.5, cellHeight + 0.5);
       }
     }
 
     // Draw pitch markings
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 1.5;
 
     // Center line
     ctx.beginPath();
@@ -113,57 +128,49 @@ export function TerritoryMap({
     ctx.stroke();
 
     // Center circle
+    const centerCircleRadius = (10 / STATSBOMB_PITCH.width) * width;
     ctx.beginPath();
-    ctx.arc(width / 2, height / 2, 20, 0, Math.PI * 2);
+    ctx.arc(width / 2, height / 2, centerCircleRadius, 0, Math.PI * 2);
     ctx.stroke();
 
     // Penalty areas
-    const paWidth = (STATSBOMB_PITCH.penaltyAreaWidth / STATSBOMB_PITCH.height) * height;
-    const paDepth = (STATSBOMB_PITCH.penaltyAreaDepth / STATSBOMB_PITCH.width) * width;
+    const paWidthPx = (STATSBOMB_PITCH.penaltyAreaWidth / STATSBOMB_PITCH.height) * height;
+    const paDepthPx = (STATSBOMB_PITCH.penaltyAreaDepth / STATSBOMB_PITCH.width) * width;
 
-    ctx.strokeRect(0, (height - paWidth) / 2, paDepth, paWidth);
-    ctx.strokeRect(width - paDepth, (height - paWidth) / 2, paDepth, paWidth);
+    // Left penalty area
+    ctx.strokeRect(0, (height - paWidthPx) / 2, paDepthPx, paWidthPx);
+    // Right penalty area
+    ctx.strokeRect(width - paDepthPx, (height - paWidthPx) / 2, paDepthPx, paWidthPx);
 
-  }, [events, homeTeamId, awayTeamId, homeColor, awayColor]);
+    // Goal areas
+    const gaWidthPx = (STATSBOMB_PITCH.goalAreaWidth / STATSBOMB_PITCH.height) * height;
+    const gaDepthPx = (STATSBOMB_PITCH.goalAreaDepth / STATSBOMB_PITCH.width) * width;
+
+    ctx.strokeRect(0, (height - gaWidthPx) / 2, gaDepthPx, gaWidthPx);
+    ctx.strokeRect(width - gaDepthPx, (height - gaWidthPx) / 2, gaDepthPx, gaWidthPx);
+
+  }, [events, homeTeamId, awayTeamId, homeRGB, awayRGB]);
 
   return (
     <div className={`bg-white p-4 ${className}`}>
-      <div className="relative">
-        {/* Possession label - left side */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-3">
-          <div className="text-xs text-gray-400 -rotate-90 whitespace-nowrap" style={{ transformOrigin: 'center' }}>
-            Possession
-          </div>
+      <div className="flex items-center gap-4">
+        {/* Possession - left side */}
+        <div className="text-center w-16">
+          <div className="text-xs text-gray-400 mb-1">Possession</div>
+          <div className="font-bold text-lg" style={{ color: homeColor }}>{possession.home}</div>
+          <div className="text-sm text-gray-500">{possession.away}</div>
         </div>
 
-        {/* Field tilt label - right side */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full pl-3">
-          <div className="text-xs text-gray-400 rotate-90 whitespace-nowrap" style={{ transformOrigin: 'center' }}>
-            Field tilt
-          </div>
+        {/* Territory map */}
+        <div ref={containerRef} className="flex-1">
+          <canvas ref={canvasRef} className="w-full rounded" />
         </div>
 
-        {/* Canvas with stats overlays */}
-        <div className="relative inline-block">
-          <canvas ref={canvasRef} className="rounded" />
-
-          {/* Possession stats - left side */}
-          <div
-            className="absolute left-2 top-1/2 -translate-y-1/2 text-white font-bold text-lg"
-            style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
-          >
-            <div>{possession.home}</div>
-            <div className="text-sm opacity-80">{possession.away}</div>
-          </div>
-
-          {/* Field tilt stats - right side */}
-          <div
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-white font-bold text-lg text-right"
-            style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
-          >
-            <div>{Math.round(fieldTilt.home)}</div>
-            <div className="text-sm opacity-80">{Math.round(fieldTilt.away)}</div>
-          </div>
+        {/* Field tilt - right side */}
+        <div className="text-center w-16">
+          <div className="text-xs text-gray-400 mb-1">Field tilt</div>
+          <div className="font-bold text-lg" style={{ color: homeColor }}>{Math.round(fieldTilt.home)}</div>
+          <div className="text-sm text-gray-500">{Math.round(fieldTilt.away)}</div>
         </div>
       </div>
     </div>

@@ -17,9 +17,10 @@ export function buildPassNetwork(
     minPasses?: number;
     includeUnsuccessful?: boolean;
     periodFilter?: number;
+    maxPlayers?: number;
   } = {}
 ): PassNetworkData {
-  const { minPasses = 3, includeUnsuccessful = false, periodFilter } = options;
+  const { minPasses = 3, includeUnsuccessful = false, periodFilter, maxPlayers = 11 } = options;
 
   // Get lineup for the team to find jersey numbers
   const teamLineup = lineups.find((l) => l.team_id === teamId);
@@ -97,15 +98,17 @@ export function buildPassNetwork(
     senderData.totalPasses++;
   }
 
-  // Build nodes (only players with enough passes or receiving passes)
-  const nodes: PassNetworkNode[] = [];
+  // Build nodes - get all players with pass involvement
+  const allNodes: PassNetworkNode[] = [];
   for (const [, data] of playerData) {
-    const hasEnoughPasses = data.totalPasses >= minPasses;
-    const receivesEnoughPasses = Array.from(playerData.values()).some(
-      (pd) => pd.passesTo.has(data.playerId) && (pd.passesTo.get(data.playerId)?.total ?? 0) >= minPasses
+    // Calculate total involvement (passes made + passes received)
+    const passesReceived = Array.from(playerData.values()).reduce(
+      (sum, pd) => sum + (pd.passesTo.get(data.playerId)?.total ?? 0),
+      0
     );
+    const totalInvolvement = data.totalPasses + passesReceived;
 
-    if (hasEnoughPasses || receivesEnoughPasses) {
+    if (totalInvolvement >= minPasses) {
       const avgX = data.locations.length > 0
         ? data.locations.reduce((sum, loc) => sum + loc.x, 0) / data.locations.length
         : 60;
@@ -113,7 +116,7 @@ export function buildPassNetwork(
         ? data.locations.reduce((sum, loc) => sum + loc.y, 0) / data.locations.length
         : 40;
 
-      nodes.push({
+      allNodes.push({
         playerId: data.playerId,
         name: data.name,
         avgX,
@@ -124,8 +127,15 @@ export function buildPassNetwork(
     }
   }
 
-  // Build links (only between players who are both in nodes)
+  // Sort by pass count and limit to maxPlayers (default 11)
+  const nodes = allNodes
+    .sort((a, b) => b.passCount - a.passCount)
+    .slice(0, maxPlayers);
+
+  // Rebuild nodes array with proper structure (already done above, this is for link filtering)
   const nodeIds = new Set(nodes.map((n) => n.playerId));
+
+  // Build links (only between players who are both in nodes)
   const links: PassNetworkLink[] = [];
 
   for (const [, data] of playerData) {
@@ -146,6 +156,7 @@ export function buildPassNetwork(
 
   return { nodes, links };
 }
+
 
 // Get total passes between two teams
 export function getPassStats(events: Event[], teamId: number): {

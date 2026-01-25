@@ -20,6 +20,51 @@ export function LineupTable({
     [events, lineups, teamId]
   );
 
+  // Separate starters from substitutes
+  const { starters, substitutes } = useMemo(() => {
+    const startersArr = stats.filter(p => p.substitutedIn === undefined);
+    const subsArr = stats.filter(p => p.substitutedIn !== undefined);
+
+    // Sort starters by position (GK first, then defenders, midfielders, forwards)
+    const positionOrder: Record<string, number> = {
+      'Goalkeeper': 0,
+      'GK': 0,
+      'Right Back': 1, 'RB': 1,
+      'Right Center Back': 2, 'RCB': 2,
+      'Center Back': 2, 'CB': 2,
+      'Left Center Back': 2, 'LCB': 2,
+      'Left Back': 3, 'LB': 3,
+      'Right Wing Back': 1, 'RWB': 1,
+      'Left Wing Back': 3, 'LWB': 3,
+      'Defensive Midfield': 4, 'DM': 4, 'CDM': 4,
+      'Right Defensive Midfield': 4, 'RDM': 4,
+      'Left Defensive Midfield': 4, 'LDM': 4,
+      'Center Midfield': 5, 'CM': 5,
+      'Right Center Midfield': 5, 'RCM': 5,
+      'Left Center Midfield': 5, 'LCM': 5,
+      'Center Attacking Midfield': 6, 'CAM': 6,
+      'Right Midfield': 5, 'RM': 5,
+      'Left Midfield': 5, 'LM': 5,
+      'Right Wing': 7, 'RW': 7,
+      'Left Wing': 7, 'LW': 7,
+      'Center Forward': 8, 'CF': 8,
+      'Striker': 8, 'ST': 8,
+      'Right Center Forward': 8, 'RCF': 8,
+      'Left Center Forward': 8, 'LCF': 8,
+    };
+
+    startersArr.sort((a, b) => {
+      const aOrder = positionOrder[a.position] ?? 10;
+      const bOrder = positionOrder[b.position] ?? 10;
+      return aOrder - bOrder;
+    });
+
+    // Sort substitutes by when they came on
+    subsArr.sort((a, b) => (a.substitutedIn ?? 90) - (b.substitutedIn ?? 90));
+
+    return { starters: startersArr, substitutes: subsArr };
+  }, [stats]);
+
   const allKeyEvents = useMemo(() => {
     const eventMap = new Map<number, ReturnType<typeof getPlayerKeyEvents>>();
     for (const player of stats) {
@@ -32,65 +77,92 @@ export function LineupTable({
     <div className={`bg-white text-sm ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 px-2 py-1 border-b text-xs text-gray-400">
-        <div className="w-6"></div>
+        <div className="w-5"></div>
         <div className="w-8">Pos</div>
         <div className="flex-1">Name</div>
         <div className="w-8 text-center">Min</div>
-        <div className="w-16 text-center">Stats</div>
+        <div className="w-12"></div>
       </div>
 
-      {/* Players */}
+      {/* Starting XI */}
       <div className="divide-y divide-gray-100">
-        {stats.map((player) => {
-          const keyEvents = allKeyEvents.get(player.playerId) ?? [];
-          const isSubIn = player.substitutedIn !== undefined;
-          const isSubOut = player.substitutedOut !== undefined;
+        {starters.map((player) => (
+          <PlayerRow
+            key={player.playerId}
+            player={player}
+            keyEvents={allKeyEvents.get(player.playerId) ?? []}
+          />
+        ))}
+      </div>
 
-          return (
-            <div
-              key={player.playerId}
-              className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50"
-            >
-              {/* Sub indicator */}
-              <div className="w-6 flex items-center justify-center">
-                {isSubIn && (
-                  <span className="text-green-500 text-xs">▲</span>
-                )}
-                {isSubOut && !isSubIn && (
-                  <span className="text-red-500 text-xs">▼</span>
-                )}
-              </div>
+      {/* Substitutes */}
+      {substitutes.length > 0 && (
+        <>
+          <div className="px-2 py-1 bg-gray-50 text-xs text-gray-400 border-y">
+            Substitutes
+          </div>
+          <div className="divide-y divide-gray-100">
+            {substitutes.map((player) => (
+              <PlayerRow
+                key={player.playerId}
+                player={player}
+                keyEvents={allKeyEvents.get(player.playerId) ?? []}
+                isSub
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
-              {/* Position */}
-              <div className="w-8 text-xs text-gray-500">
-                {getPositionAbbrev(player.position)}
-              </div>
+interface PlayerRowProps {
+  player: ReturnType<typeof buildPlayerStats>[0];
+  keyEvents: ReturnType<typeof getPlayerKeyEvents>;
+  isSub?: boolean;
+}
 
-              {/* Name */}
-              <div className="flex-1 truncate">
-                {player.playerName}
-              </div>
+function PlayerRow({ player, keyEvents, isSub }: PlayerRowProps) {
+  const isSubOut = player.substitutedOut !== undefined;
 
-              {/* Minutes */}
-              <div className="w-8 text-center text-gray-500">
-                {player.minutesPlayed}'
-              </div>
+  return (
+    <div className={`flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 ${isSub ? 'text-gray-600' : ''}`}>
+      {/* Sub indicator */}
+      <div className="w-5 flex items-center justify-center text-xs">
+        {isSub && <span className="text-green-500">▲</span>}
+        {isSubOut && !isSub && <span className="text-red-500">▼</span>}
+      </div>
 
-              {/* Event icons */}
-              <div className="w-16 flex items-center justify-end gap-0.5">
-                {keyEvents.map((event, i) => (
-                  <EventIcon key={i} event={event} />
-                ))}
-                {player.cards.yellow > 0 && (
-                  <span className="inline-block w-2.5 h-3.5 bg-yellow-400 rounded-sm" />
-                )}
-                {player.cards.red > 0 && (
-                  <span className="inline-block w-2.5 h-3.5 bg-red-600 rounded-sm" />
-                )}
-              </div>
-            </div>
-          );
-        })}
+      {/* Position */}
+      <div className="w-8 text-xs text-gray-500">
+        {getPositionAbbrev(player.position)}
+      </div>
+
+      {/* Name */}
+      <div className="flex-1 truncate text-xs">
+        {player.playerName}
+      </div>
+
+      {/* Minutes */}
+      <div className="w-8 text-center text-xs text-gray-500">
+        {isSub ? `${player.substitutedIn}'` : `${player.minutesPlayed}'`}
+      </div>
+
+      {/* Event icons */}
+      <div className="w-12 flex items-center justify-end gap-0.5">
+        {keyEvents.filter(e => e.type === 'goal').map((_, i) => (
+          <span key={`goal-${i}`} className="text-xs">⚽</span>
+        ))}
+        {keyEvents.filter(e => e.type === 'assist').map((_, i) => (
+          <span key={`assist-${i}`} className="text-xs text-blue-500 font-bold">A</span>
+        ))}
+        {player.cards.yellow > 0 && (
+          <span className="inline-block w-2 h-3 bg-yellow-400 rounded-sm" />
+        )}
+        {player.cards.red > 0 && (
+          <span className="inline-block w-2 h-3 bg-red-600 rounded-sm" />
+        )}
       </div>
     </div>
   );
@@ -124,29 +196,6 @@ function getPositionAbbrev(position: string): string {
     'Striker': 'ST',
   };
   return abbrevs[position] ?? position.substring(0, 3).toUpperCase();
-}
-
-interface EventIconProps {
-  event: {
-    type: 'goal' | 'assist' | 'yellow' | 'red' | 'sub_in' | 'sub_out';
-    minute: number;
-    period: number;
-  };
-}
-
-function EventIcon({ event }: EventIconProps) {
-  switch (event.type) {
-    case 'goal':
-      return (
-        <span className="text-xs" title="Goal">⚽</span>
-      );
-    case 'assist':
-      return (
-        <span className="text-xs text-blue-500 font-bold" title="Assist">A</span>
-      );
-    default:
-      return null;
-  }
 }
 
 export default LineupTable;
