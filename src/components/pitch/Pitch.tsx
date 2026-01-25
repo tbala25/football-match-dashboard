@@ -65,6 +65,12 @@ export function Pitch({
   const penaltyArcRadius = scale(p.centerCircleRadius);
   const cornerRadius = scale(p.cornerArcRadius);
 
+  // Calculate correct penalty arc angle (arc outside penalty area)
+  // Arc radius = 10 yards, penalty area depth = 18 yards, penalty spot = 12 yards from goal
+  // Distance from spot to penalty area edge = 18 - 12 = 6 yards
+  const edgeDistance = p.penaltyAreaDepth - p.penaltySpotDistance; // 6 yards
+  const penaltyArcAngle = Math.acos(edgeDistance / p.centerCircleRadius) * (180 / Math.PI); // ~53.13 degrees
+
   return (
     <div ref={containerRef} className={`pitch-container ${className}`}>
       <svg
@@ -156,8 +162,8 @@ export function Pitch({
               penaltySpotDistance + 2,
               centerY,
               penaltyArcRadius,
-              -50,
-              50
+              -penaltyArcAngle,
+              penaltyArcAngle
             )}
           />
 
@@ -167,8 +173,8 @@ export function Pitch({
               width - penaltySpotDistance - 2,
               centerY,
               penaltyArcRadius,
-              130,
-              230
+              180 - penaltyArcAngle,
+              180 + penaltyArcAngle
             )}
           />
 

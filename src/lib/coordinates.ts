@@ -164,18 +164,20 @@ export function createRotatedCoordinateMapper(config: RotatedViewportConfig): Ro
       // Transform coordinates:
       // - Original y (0-80) -> Viewport x (0-width)
       // - Original x (60-120) -> Viewport y (height to 0, goal at top)
-
-      // For home team (attacking right): x=120 is at top (y=0 in viewport)
-      // For away team (attacking left): need to flip
+      //
+      // StatsBomb normalizes all coordinates to "attacking right" (goal at x=120)
+      // So both home and away team shots are in the x: 60-120 range
+      // For away team, we mirror the view to show their perspective
 
       let viewportX: number;
       let viewportY: number;
 
       if (isAwayTeam) {
-        // Away team attacks left (goal at x=0), but we flip to show goal at top
-        // Original x: 0-60 -> Viewport y: 0-height (goal at top)
+        // Away team: mirror the view (flip both x and y)
+        // Goal (x=120) should still be at top (viewport y=0)
+        // But y-axis is flipped for mirror effect
         viewportX = (pitchWidth - y) * scaleX; // Flip y for mirror view
-        viewportY = x * scaleY; // x: 0 at top
+        viewportY = (120 - x) * scaleY; // Same as home: 120 at top, 60 at bottom
       } else {
         // Home team attacks right (goal at x=120)
         // Original x: 60-120 -> Viewport y: 0-height (120 at top)
@@ -192,7 +194,7 @@ export function createRotatedCoordinateMapper(config: RotatedViewportConfig): Ro
 
       if (isAwayTeam) {
         y = pitchWidth - (viewportX / scaleX);
-        x = viewportY / scaleY;
+        x = 120 - (viewportY / scaleY);
       } else {
         y = viewportX / scaleX;
         x = 120 - (viewportY / scaleY);

@@ -79,8 +79,16 @@ export function PossessionTimeline({
 
     const barHeight = 25;
     const centerY = height / 2;
-    const numMinutes = possessionByMinute.length;
-    const barWidth = Math.max(width / numMinutes, 2);
+
+    // Filter out halftime gap (minutes with no possession data)
+    const activeMinutes = possessionByMinute.filter(
+      m => m.homeDuration > 0 || m.awayDuration > 0
+    );
+
+    const numActiveMinutes = activeMinutes.length;
+    if (numActiveMinutes === 0) return;
+
+    const barWidth = Math.max(width / numActiveMinutes, 2);
 
     // Max possible duration per minute is 60 seconds
     const maxDuration = 60;
@@ -97,9 +105,15 @@ export function PossessionTimeline({
     ctx.lineTo(width, centerY);
     ctx.stroke();
 
-    // Draw bars based on possession duration
-    possessionByMinute.forEach((m, i) => {
-      const x = (i / numMinutes) * width;
+    // Build a mapping from active index to original minute for time markers
+    const minuteToActiveIndex = new Map<number, number>();
+    activeMinutes.forEach((m, i) => {
+      minuteToActiveIndex.set(m.minute, i);
+    });
+
+    // Draw bars based on possession duration (using filtered active minutes)
+    activeMinutes.forEach((m, i) => {
+      const x = (i / numActiveMinutes) * width;
 
       // Home team bar (pointing up) - scaled by duration in seconds
       if (m.homeDuration > 0) {
@@ -120,15 +134,17 @@ export function PossessionTimeline({
 
     ctx.globalAlpha = 1;
 
-    // Draw time markers
+    // Draw time markers - position based on actual data indices
     ctx.fillStyle = '#9ca3af';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
 
     const timeMarkers = [1, 15, 30, 45, 60, 75, 90];
     timeMarkers.forEach(minute => {
-      if (minute <= numMinutes) {
-        const x = (minute / numMinutes) * width;
+      // Find the closest active minute to this marker
+      const activeIndex = minuteToActiveIndex.get(minute);
+      if (activeIndex !== undefined) {
+        const x = ((activeIndex + 0.5) / numActiveMinutes) * width;
         ctx.fillText(`${minute}'`, x, height - 2);
       }
     });
@@ -136,7 +152,8 @@ export function PossessionTimeline({
   }, [possessionByMinute, homeColor, awayColor]);
 
   return (
-    <div className={`bg-white p-4 ${className}`}>
+    <div className={`pro-card p-4 ${className}`}>
+      <h3 className="section-title mb-3">Possession Flow</h3>
       <div ref={containerRef} className="w-full">
         <canvas ref={canvasRef} className="w-full" style={{ height: '60px' }} />
       </div>

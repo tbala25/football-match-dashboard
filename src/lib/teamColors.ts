@@ -502,6 +502,12 @@ const clubTeams: Record<string, TeamBranding> = {
     logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',
   },
 
+  // MLS Teams
+  'Charlotte FC': {
+    colors: { primary: '#1A2D5A', secondary: '#5ECCAB', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/0a/Charlotte_FC_crest.svg',
+  },
+
   // La Liga - All 20 clubs
   'Barcelona': {
     colors: { primary: '#004D98', secondary: '#A50044', text: '#FFFFFF' },
