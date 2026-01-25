@@ -78,9 +78,11 @@ export function calculatePossessionPercentage(
   const total = homeDuration + awayDuration;
   if (total === 0) return { home: 50, away: 50 };
 
+  // Ensure home + away = 100% by computing away as the remainder
+  const homePercent = Math.round((homeDuration / total) * 100);
   return {
-    home: Math.round((homeDuration / total) * 100),
-    away: Math.round((awayDuration / total) * 100),
+    home: homePercent,
+    away: 100 - homePercent,
   };
 }
 

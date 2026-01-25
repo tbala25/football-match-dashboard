@@ -8,7 +8,7 @@ import { MatchStats } from '../components/match/MatchStats';
 import { VerticalPassNetwork } from '../components/pitch/VerticalPassNetwork';
 import { TerritoryMap } from '../components/pitch/TerritoryMap';
 import { TeamShotMap } from '../components/pitch/TeamShotMap';
-import { Loading, ErrorMessage } from '../components/ui';
+import { Loading, ErrorMessage, MatchPageSkeleton } from '../components/ui';
 import { buildPassNetwork, extractShots, getXGSummary } from '../lib/transformers';
 import { getTeamColors } from '../lib/teamColors';
 import type { Match } from '../types/statsbomb';
@@ -80,11 +80,7 @@ export function MatchPageNew() {
   }
 
   if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Loading message="Loading match data..." />
-      </div>
-    );
+    return <MatchPageSkeleton />;
   }
 
   if (isError) {
@@ -100,20 +96,29 @@ export function MatchPageNew() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-4 bg-gray-50 min-h-screen">
-      {/* Back navigation */}
-      <Link
-        to={`/competition/${match.competition.competition_id}/season/${match.season.season_id}`}
-        className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-flex items-center gap-1"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Matches
-      </Link>
+      {/* Breadcrumb navigation */}
+      <nav className="flex items-center gap-2 text-sm mb-4">
+        <Link to="/" className="text-gray-500 hover:text-gray-700">
+          Home
+        </Link>
+        <span className="text-gray-300">/</span>
+        <Link
+          to={`/competition/${match.competition.competition_id}/season/${match.season.season_id}`}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          {match.competition.competition_name}
+        </Link>
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-900 font-medium">
+          {homeTeamName} vs {awayTeamName}
+        </span>
+      </nav>
 
-      {/* Match header */}
+      {/* Match header with xG data */}
       <MatchHeaderNew
         match={match}
+        homeXG={xgSummary?.home.xg}
+        awayXG={xgSummary?.away.xg}
         homeColor={homeColor}
         awayColor={awayColor}
         className="mb-4"
@@ -171,6 +176,8 @@ export function MatchPageNew() {
               events={events}
               homeTeamId={homeTeamId}
               awayTeamId={awayTeamId}
+              homeTeamName={homeTeamName}
+              awayTeamName={awayTeamName}
               homeColor={homeColor}
               awayColor={awayColor}
             />
@@ -178,8 +185,8 @@ export function MatchPageNew() {
 
           {/* Shot maps - side by side */}
           {(homeShots.length > 0 || awayShots.length > 0) && (
-            <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 text-center">Shot Maps</h3>
+            <div className="pro-card p-5">
+              <h3 className="section-title text-center mb-4">Shot Maps</h3>
               <div className="grid grid-cols-2 gap-4">
                 <TeamShotMap
                   shots={homeShots}

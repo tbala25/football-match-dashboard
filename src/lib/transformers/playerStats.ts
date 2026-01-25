@@ -160,8 +160,11 @@ export function getPlayerKeyEvents(
       const isRed = card.card_type === 'Red Card' || card.card_type === 'Second Yellow';
 
       if (isYellow || isRed) {
+        // Time format is "HH:MM:SS.mmm" - calculate full minutes from hours and minutes
         const timeParts = card.time.split(':');
-        const minute = timeParts.length >= 2 ? parseInt(timeParts[1]) : 0;
+        const minute = timeParts.length >= 2
+          ? parseInt(timeParts[0]) * 60 + parseInt(timeParts[1])
+          : 0;
 
         keyEvents.push({
           type: isRed ? 'red' : 'yellow',
@@ -173,23 +176,29 @@ export function getPlayerKeyEvents(
 
     for (const position of player.positions) {
       if (position.start_reason === 'Substitution') {
+        // Time format is "HH:MM:SS.mmm" - calculate full minutes
         const fromParts = position.from.split(':');
-        const minute = fromParts.length >= 2 ? parseInt(fromParts[1]) : 0;
+        const subInMinute = fromParts.length >= 2
+          ? parseInt(fromParts[0]) * 60 + parseInt(fromParts[1])
+          : 0;
 
         keyEvents.push({
           type: 'sub_in',
-          minute,
+          minute: subInMinute,
           period: position.from_period,
         });
       }
 
       if (position.end_reason === 'Substitution' && position.to) {
+        // Time format is "HH:MM:SS.mmm" - calculate full minutes
         const toParts = position.to.split(':');
-        const minute = toParts.length >= 2 ? parseInt(toParts[1]) : 0;
+        const subOutMinute = toParts.length >= 2
+          ? parseInt(toParts[0]) * 60 + parseInt(toParts[1])
+          : 0;
 
         keyEvents.push({
           type: 'sub_out',
-          minute,
+          minute: subOutMinute,
           period: position.to_period!,
         });
       }

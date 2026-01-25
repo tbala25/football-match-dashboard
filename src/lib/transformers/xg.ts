@@ -83,7 +83,8 @@ export function getXGSummary(
   const homeShots = shots.filter((s) => s.teamId === homeTeamId);
   const awayShots = shots.filter((s) => s.teamId === awayTeamId);
 
-  const onTargetOutcomes = ['Goal', 'Saved', 'Saved Off Target', 'Saved To Post'];
+  // "Saved Off Target" is contradictory - if saved, it's on target; if off target, not saved by keeper
+  const onTargetOutcomes = ['Goal', 'Saved', 'Saved To Post'];
 
   return {
     home: {

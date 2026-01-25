@@ -222,3 +222,149 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Goal celebration animation */
+@keyframes goalCelebrate {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.2); }
+  50% { transform: scale(0.95); }
+  75% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.animate-goal {
+  animation: goalCelebrate 0.5s ease-out;
+}
+
+/* Stat bar fill animation */
+@keyframes statBarFill {
+  from { width: 0%; }
+  to { width: var(--fill-width, 100%); }
+}
+
+.stat-bar-animated {
+  animation: statBarFill 0.8s ease-out forwards;
+}
+
+/* Match header gradient overlays */
+.team-gradient-home {
+  background: linear-gradient(135deg, var(--home-color, #1e40af) 0%, transparent 100%);
+}
+
+.team-gradient-away {
+  background: linear-gradient(-135deg, var(--away-color, #dc2626) 0%, transparent 100%);
+}
+
+/* xG Timeline area fill */
+.xg-area-home {
+  fill: var(--home-color, #1e40af);
+  fill-opacity: 0.15;
+}
+
+.xg-area-away {
+  fill: var(--away-color, #dc2626);
+  fill-opacity: 0.15;
+}
+
+/* Professional card styling */
+.pro-card {
+  @apply bg-white rounded-xl transition-all duration-200;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 4px 16px -4px rgba(0, 0, 0, 0.1);
+}
+
+.pro-card:hover {
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.15), 0 12px 32px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Match header professional styling */
+.match-header-pro {
+  @apply bg-white rounded-xl shadow-lg overflow-hidden;
+}
+
+/* Score typography */
+.score-lg {
+  @apply text-5xl font-bold tabular-nums tracking-tight leading-none;
+}
+
+.score-xl {
+  @apply text-6xl font-bold tabular-nums tracking-tighter leading-none;
+}
+
+/* Team name styling */
+.team-name-lg {
+  @apply text-lg font-semibold text-gray-900 truncate;
+}
+
+/* xG bar styling */
+.xg-comparison-bar {
+  @apply h-2 rounded-full overflow-hidden bg-gray-100;
+}
+
+.xg-comparison-fill {
+  @apply h-full transition-all duration-500 ease-out;
+}
+
+/* Section headers */
+.section-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.section-subtitle {
+  @apply text-sm text-gray-500;
+}
+
+/* Skeleton loading states */
+.skeleton {
+  @apply bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-text {
+  @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-circle {
+  @apply rounded-full bg-gray-200 animate-pulse;
+}
+
+/* Form indicator dots */
+.form-dot {
+  @apply w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white;
+}
+
+.form-dot-win {
+  @apply bg-green-500;
+}
+
+.form-dot-draw {
+  @apply bg-gray-400;
+}
+
+.form-dot-loss {
+  @apply bg-red-500;
+}
+
+/* Player jersey number badge */
+.jersey-badge {
+  @apply w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white;
+}
+
+/* Event icons */
+.event-icon {
+  @apply w-5 h-5 flex items-center justify-center rounded-full text-xs;
+}
+
+.event-icon-goal {
+  @apply bg-green-500 text-white;
+}
+
+.event-icon-yellow {
+  @apply bg-yellow-400 text-gray-900;
+}
+
+.event-icon-red {
+  @apply bg-red-500 text-white;
+}
+
+.event-icon-sub {
+  @apply bg-blue-500 text-white;
+}

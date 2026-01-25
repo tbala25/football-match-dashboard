@@ -5,3 +5,7 @@ export { LineupTable } from './LineupTable';
 export { Timeline } from './Timeline';
 export { PossessionTimeline } from './PossessionTimeline';
 export { MatchStats } from './MatchStats';
+export { FormationDisplay } from './FormationDisplay';
+export { KeyMoments } from './KeyMoments';
+export { TeamForm, generateFormFromMatches } from './TeamForm';
+export { PlayerCard } from './PlayerCard';
