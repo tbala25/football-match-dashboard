@@ -112,79 +112,56 @@ export function TeamShotMap({
       {/* Shot map */}
       <div className="p-2">
         <svg width={width} height={height} className="mx-auto">
-          {/* Pitch background */}
+          {/* Light background */}
           <rect
             x={padding.left}
             y={padding.top}
             width={pitchWidth}
             height={pitchHeight}
-            fill="#3d8c40"
-            rx={4}
-          />
-
-          {/* Pitch pattern (subtle stripes) */}
-          <defs>
-            <pattern
-              id={`pitch-stripes-${teamName.replace(/\s/g, '-')}`}
-              width="20"
-              height="20"
-              patternUnits="userSpaceOnUse"
-              patternTransform="rotate(90)"
-            >
-              <rect width="10" height="20" fill="rgba(255,255,255,0.03)" />
-            </pattern>
-          </defs>
-          <rect
-            x={padding.left}
-            y={padding.top}
-            width={pitchWidth}
-            height={pitchHeight}
-            fill={`url(#pitch-stripes-${teamName.replace(/\s/g, '-')})`}
-            rx={4}
+            fill="#f5f5f0"
           />
 
           {/* Pitch markings */}
           <g transform={`translate(${padding.left}, ${padding.top})`}>
-            {/* Penalty area */}
+            {/* Goal - thick black bar at top */}
+            <rect
+              x={markings.goal.x}
+              y={0}
+              width={markings.goal.width}
+              height={4}
+              fill="#333"
+            />
+
+            {/* End line */}
+            <line
+              x1={0}
+              y1={4}
+              x2={pitchWidth}
+              y2={4}
+              stroke="#999"
+              strokeWidth={1}
+            />
+
+            {/* 18-yard box (penalty area) */}
             <rect
               x={markings.penaltyArea.x}
-              y={markings.penaltyArea.y}
+              y={4}
               width={markings.penaltyArea.width}
               height={markings.penaltyArea.height}
               fill="none"
-              stroke="rgba(255,255,255,0.5)"
-              strokeWidth={1.5}
+              stroke="#999"
+              strokeWidth={1}
             />
 
-            {/* Goal area */}
+            {/* 6-yard box (goal area) */}
             <rect
               x={markings.goalArea.x}
-              y={markings.goalArea.y}
+              y={4}
               width={markings.goalArea.width}
               height={markings.goalArea.height}
               fill="none"
-              stroke="rgba(255,255,255,0.5)"
-              strokeWidth={1.5}
-            />
-
-            {/* Goal */}
-            <rect
-              x={markings.goal.x}
-              y={markings.goal.y - 3}
-              width={markings.goal.width}
-              height={6}
-              fill="#fff"
-              stroke="#333"
+              stroke="#999"
               strokeWidth={1}
-              rx={1}
-            />
-
-            {/* Penalty spot */}
-            <circle
-              cx={markings.penaltySpot.x}
-              cy={markings.penaltySpot.y}
-              r={2}
-              fill="rgba(255,255,255,0.6)"
             />
 
             {/* Shots */}
@@ -194,55 +171,27 @@ export function TeamShotMap({
 
               return (
                 <g key={shot.id} className="cursor-pointer">
-                  {/* Drop shadow */}
-                  <circle
-                    cx={pos.x + 1}
-                    cy={pos.y + 1}
-                    r={r}
-                    fill="rgba(0,0,0,0.2)"
-                  />
-
-                  {/* Shot circle with gradient */}
-                  <defs>
-                    <radialGradient id={`shot-grad-${shot.id}`}>
-                      <stop
-                        offset="0%"
-                        stopColor={shot.isGoal ? '#fff' : teamColor}
-                        stopOpacity={shot.isGoal ? 0.9 : 0.3}
-                      />
-                      <stop
-                        offset="100%"
-                        stopColor={teamColor}
-                        stopOpacity={shot.isGoal ? 1 : 0.8}
-                      />
-                    </radialGradient>
-                  </defs>
-
                   <circle
                     cx={pos.x}
                     cy={pos.y}
                     r={r}
-                    fill={shot.isGoal ? `url(#shot-grad-${shot.id})` : 'transparent'}
+                    fill={shot.isGoal ? teamColor : 'transparent'}
                     stroke={teamColor}
-                    strokeWidth={shot.isGoal ? 3 : 2}
-                    opacity={shot.isGoal ? 1 : 0.7}
-                    className="transition-transform hover:scale-110"
-                    style={{ transformOrigin: `${pos.x}px ${pos.y}px` }}
+                    strokeWidth={2}
+                    opacity={0.8}
                   />
 
-                  {/* Goal marker */}
+                  {/* Goal indicator line */}
                   {shot.isGoal && (
-                    <text
-                      x={pos.x}
-                      y={pos.y + 4}
-                      textAnchor="middle"
-                      fontSize={r * 0.9}
-                      fill="#fff"
-                      fontWeight="bold"
-                      style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
-                    >
-                      G
-                    </text>
+                    <line
+                      x1={pos.x}
+                      y1={pos.y}
+                      x2={markings.goal.x + markings.goal.width / 2}
+                      y2={4}
+                      stroke={teamColor}
+                      strokeWidth={1.5}
+                      opacity={0.6}
+                    />
                   )}
 
                   {/* Tooltip */}
@@ -255,25 +204,13 @@ export function TeamShotMap({
           </g>
         </svg>
 
-        {/* Stats summary */}
-        <div className="flex justify-around mt-2 text-xs">
-          <div className="text-center">
-            <div className="font-bold text-lg" style={{ color: teamColor }}>
-              {stats.xg.toFixed(2)}
-            </div>
-            <div className="text-gray-500">xG</div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold text-lg" style={{ color: teamColor }}>
-              {stats.shots}
-            </div>
-            <div className="text-gray-500">Shots</div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold text-lg" style={{ color: teamColor }}>
-              {stats.goals}
-            </div>
-            <div className="text-gray-500">Goals</div>
+        {/* xG summary - simple boxed style */}
+        <div className="flex justify-center mt-2">
+          <div
+            className="px-4 py-1 rounded border-2 text-sm font-semibold"
+            style={{ borderColor: teamColor, color: teamColor }}
+          >
+            {stats.xg.toFixed(1)} xG
           </div>
         </div>
       </div>

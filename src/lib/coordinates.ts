@@ -165,40 +165,21 @@ export function createRotatedCoordinateMapper(config: RotatedViewportConfig): Ro
       // - Original y (0-80) -> Viewport x (0-width)
       // - Original x (60-120) -> Viewport y (height to 0, goal at top)
       //
-      // StatsBomb normalizes all coordinates to "attacking right" (goal at x=120)
-      // So both home and away team shots are in the x: 60-120 range
-      // For away team, we mirror the view to show their perspective
+      // StatsBomb normalizes ALL coordinates to "attacking right" (goal at x=120)
+      // Both home and away team shots are in the same coordinate system (x: 60-120)
+      // So both teams use identical transformations - no mirroring needed
 
-      let viewportX: number;
-      let viewportY: number;
-
-      if (isAwayTeam) {
-        // Away team: mirror the view (flip both x and y)
-        // Goal (x=120) should still be at top (viewport y=0)
-        // But y-axis is flipped for mirror effect
-        viewportX = (pitchWidth - y) * scaleX; // Flip y for mirror view
-        viewportY = (120 - x) * scaleY; // Same as home: 120 at top, 60 at bottom
-      } else {
-        // Home team attacks right (goal at x=120)
-        // Original x: 60-120 -> Viewport y: 0-height (120 at top)
-        viewportX = y * scaleX;
-        viewportY = (120 - x) * scaleY; // 120 maps to 0 (top), 60 maps to height (bottom)
-      }
+      // Goal at x=120 should be at top (viewport y=0)
+      // Midfield at x=60 should be at bottom (viewport y=height)
+      const viewportX = y * scaleX;
+      const viewportY = (120 - x) * scaleY;
 
       return { x: viewportX, y: viewportY };
     },
 
     fromViewport: (viewportX: number, viewportY: number) => {
-      let x: number;
-      let y: number;
-
-      if (isAwayTeam) {
-        y = pitchWidth - (viewportX / scaleX);
-        x = 120 - (viewportY / scaleY);
-      } else {
-        y = viewportX / scaleX;
-        x = 120 - (viewportY / scaleY);
-      }
+      const y = viewportX / scaleX;
+      const x = 120 - (viewportY / scaleY);
 
       return { x, y };
     },

@@ -2,7 +2,7 @@ import type { Event, ShotData, XGTimelinePoint } from '../../types/statsbomb';
 
 export function extractShots(events: Event[]): ShotData[] {
   return events
-    .filter((e) => e.type.name === 'Shot' && e.shot)
+    .filter((e) => e.type.name === 'Shot' && e.shot && e.period <= 4) // Exclude period 5 (penalty shootout)
     .map((e) => ({
       id: e.id,
       playerId: e.player!.id,

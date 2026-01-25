@@ -507,6 +507,142 @@ const clubTeams: Record<string, TeamBranding> = {
     colors: { primary: '#1A2D5A', secondary: '#5ECCAB', text: '#FFFFFF' },
     logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/0a/Charlotte_FC_crest.svg',
   },
+  'Inter Miami CF': {
+    colors: { primary: '#F5B8C0', secondary: '#231F20', text: '#231F20' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Inter_Miami_CF_logo.svg',
+  },
+  'Inter Miami': {
+    colors: { primary: '#F5B8C0', secondary: '#231F20', text: '#231F20' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Inter_Miami_CF_logo.svg',
+  },
+  'LA Galaxy': {
+    colors: { primary: '#00245D', secondary: '#FFD200', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/70/Los_Angeles_Galaxy_logo.svg',
+  },
+  'Los Angeles FC': {
+    colors: { primary: '#000000', secondary: '#C39E6D', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e8/Los_Angeles_FC.svg',
+  },
+  'LAFC': {
+    colors: { primary: '#000000', secondary: '#C39E6D', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e8/Los_Angeles_FC.svg',
+  },
+  'Seattle Sounders FC': {
+    colors: { primary: '#5D9741', secondary: '#005595', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/28/Seattle_Sounders_FC.svg',
+  },
+  'Atlanta United FC': {
+    colors: { primary: '#80000A', secondary: '#A19060', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a4/Atlanta_United_FC_logo.svg',
+  },
+  'Atlanta United': {
+    colors: { primary: '#80000A', secondary: '#A19060', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a4/Atlanta_United_FC_logo.svg',
+  },
+  'New York City FC': {
+    colors: { primary: '#6CACE4', secondary: '#041E42', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d1/New_York_City_FC_logo.svg',
+  },
+  'NYCFC': {
+    colors: { primary: '#6CACE4', secondary: '#041E42', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d1/New_York_City_FC_logo.svg',
+  },
+  'New York Red Bulls': {
+    colors: { primary: '#ED1E36', secondary: '#FFCD00', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/34/New_York_Red_Bulls_logo.svg',
+  },
+  'Philadelphia Union': {
+    colors: { primary: '#002D55', secondary: '#B08D57', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9d/Philadelphia_Union_logo.svg',
+  },
+  'Portland Timbers': {
+    colors: { primary: '#004812', secondary: '#D69A00', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/Portland_Timbers_logo.svg',
+  },
+  'Columbus Crew': {
+    colors: { primary: '#000000', secondary: '#FFE100', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/5f/Columbus_Crew_SC_logo.svg',
+  },
+  'FC Cincinnati': {
+    colors: { primary: '#003087', secondary: '#FE5000', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/1d/FC_Cincinnati_logo.svg',
+  },
+  'Nashville SC': {
+    colors: { primary: '#ECE83A', secondary: '#1F1646', text: '#1F1646' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Nashville_SC_logo.svg',
+  },
+  'Orlando City SC': {
+    colors: { primary: '#612B9B', secondary: '#FDE192', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c4/Orlando_City_SC_logo.svg',
+  },
+  'Orlando City': {
+    colors: { primary: '#612B9B', secondary: '#FDE192', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c4/Orlando_City_SC_logo.svg',
+  },
+  'Toronto FC': {
+    colors: { primary: '#B81137', secondary: '#455560', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d7/Toronto_FC_Logo.svg',
+  },
+  'DC United': {
+    colors: { primary: '#000000', secondary: '#EF3E42', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/85/D.C._United_logo.svg',
+  },
+  'D.C. United': {
+    colors: { primary: '#000000', secondary: '#EF3E42', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/85/D.C._United_logo.svg',
+  },
+  'CF Montréal': {
+    colors: { primary: '#0033A1', secondary: '#000000', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/CF_Montreal_logo.svg',
+  },
+  'Chicago Fire FC': {
+    colors: { primary: '#AF2626', secondary: '#0A174A', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Chicago_Fire_FC_logo.svg',
+  },
+  'Houston Dynamo FC': {
+    colors: { primary: '#FF6B00', secondary: '#101820', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9c/Houston_Dynamo_FC_logo.svg',
+  },
+  'Sporting Kansas City': {
+    colors: { primary: '#002F65', secondary: '#9BCBEB', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/4f/Sporting_Kansas_City_logo.svg',
+  },
+  'Minnesota United FC': {
+    colors: { primary: '#231F20', secondary: '#9BCBEB', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Minnesota_United_FC_logo.svg',
+  },
+  'Real Salt Lake': {
+    colors: { primary: '#B30838', secondary: '#013A81', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f6/Real_Salt_Lake_logo.svg',
+  },
+  'FC Dallas': {
+    colors: { primary: '#BF0D3E', secondary: '#002D72', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/81/FC_Dallas_logo.svg',
+  },
+  'Colorado Rapids': {
+    colors: { primary: '#862633', secondary: '#8BB8E8', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/56/Colorado_Rapids_logo.svg',
+  },
+  'Vancouver Whitecaps FC': {
+    colors: { primary: '#00245E', secondary: '#9DC2EA', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/59/Vancouver_Whitecaps_FC_logo.svg',
+  },
+  'San Jose Earthquakes': {
+    colors: { primary: '#0051BA', secondary: '#000000', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/54/San_Jose_Earthquakes_logo.svg',
+  },
+  'Austin FC': {
+    colors: { primary: '#00B140', secondary: '#000000', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Austin_FC_logo.svg',
+  },
+  'St. Louis City SC': {
+    colors: { primary: '#D22630', secondary: '#0A1E2C', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/St._Louis_City_SC_logo.svg',
+  },
+  'New England Revolution': {
+    colors: { primary: '#002B5C', secondary: '#D80024', text: '#FFFFFF' },
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/New_England_Revolution_logo.svg',
+  },
 
   // La Liga - All 20 clubs
   'Barcelona': {

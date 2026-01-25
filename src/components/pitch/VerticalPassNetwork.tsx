@@ -26,22 +26,14 @@ export function VerticalPassNetwork({
   const scaleY = pitchHeight / STATSBOMB_PITCH.width;
 
   // Transform coordinates for vertical pitch
-  // For home team: attacking up (y increases = up on screen)
-  // For away team: attacking up (but data is flipped)
+  // Both teams: goal (x=120) at top, own half at bottom
+  // Flip y for away team to mirror horizontally
   const transformCoord = (x: number, y: number) => {
-    if (isAway) {
-      // Away team: flip x and y, then position
-      return {
-        x: padding + (STATSBOMB_PITCH.height - y) * scaleX,
-        y: padding + x * scaleY,
-      };
-    } else {
-      // Home team: x becomes vertical y (inverted), y becomes horizontal x
-      return {
-        x: padding + y * scaleX,
-        y: padding + (STATSBOMB_PITCH.width - x) * scaleY,
-      };
-    }
+    const adjustedY = isAway ? (STATSBOMB_PITCH.height - y) : y;
+    return {
+      x: padding + adjustedY * scaleX,
+      y: padding + (STATSBOMB_PITCH.width - x) * scaleY, // Always invert x - goal at top
+    };
   };
 
   // Calculate link width scale
