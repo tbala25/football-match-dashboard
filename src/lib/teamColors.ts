@@ -502,146 +502,150 @@ const clubTeams: Record<string, TeamBranding> = {
     logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',
   },
 
-  // MLS Teams
+  // MLS Teams (using official mlssoccer.com Cloudinary logos)
   'Charlotte FC': {
     colors: { primary: '#1A2D5A', secondary: '#5ECCAB', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/0a/Charlotte_FC_crest.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500045/assets/logos/mls-clubs/Club_Logo-Charlotte_p7sznf.png',
+  },
+  'Charlotte': {
+    colors: { primary: '#1A2D5A', secondary: '#5ECCAB', text: '#FFFFFF' },
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500045/assets/logos/mls-clubs/Club_Logo-Charlotte_p7sznf.png',
   },
   'Inter Miami CF': {
     colors: { primary: '#F5B8C0', secondary: '#231F20', text: '#231F20' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Inter_Miami_CF_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755405/assets/logos/mls-clubs/Club_Logo-Miami_tyqe64.png',
   },
   'Inter Miami': {
     colors: { primary: '#F5B8C0', secondary: '#231F20', text: '#231F20' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Inter_Miami_CF_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755405/assets/logos/mls-clubs/Club_Logo-Miami_tyqe64.png',
   },
   'LA Galaxy': {
     colors: { primary: '#00245D', secondary: '#FFD200', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/70/Los_Angeles_Galaxy_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755165/assets/logos/mls-clubs/Club_Logo-LA_Galaxy_fg0wjp.png',
   },
   'Los Angeles FC': {
     colors: { primary: '#000000', secondary: '#C39E6D', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e8/Los_Angeles_FC.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755309/assets/logos/mls-clubs/Club_Logo-LAFC_djrhru.png',
   },
   'LAFC': {
     colors: { primary: '#000000', secondary: '#C39E6D', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e8/Los_Angeles_FC.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755309/assets/logos/mls-clubs/Club_Logo-LAFC_djrhru.png',
   },
   'Seattle Sounders FC': {
     colors: { primary: '#5D9741', secondary: '#005595', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/28/Seattle_Sounders_FC.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748265125/assets/logos/mls-clubs/Club_Logo-Seattle_e6jk2x.png',
   },
   'Atlanta United FC': {
     colors: { primary: '#80000A', secondary: '#A19060', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a4/Atlanta_United_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747499879/assets/logos/mls-clubs/Club_Logo-Atlanta_jtk7ku.png',
   },
   'Atlanta United': {
     colors: { primary: '#80000A', secondary: '#A19060', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a4/Atlanta_United_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747499879/assets/logos/mls-clubs/Club_Logo-Atlanta_jtk7ku.png',
   },
   'New York City FC': {
     colors: { primary: '#6CACE4', secondary: '#041E42', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d1/New_York_City_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747756306/assets/logos/mls-clubs/Club_Logo-New_York_City_xu6vax.png',
   },
   'NYCFC': {
     colors: { primary: '#6CACE4', secondary: '#041E42', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d1/New_York_City_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747756306/assets/logos/mls-clubs/Club_Logo-New_York_City_xu6vax.png',
   },
   'New York Red Bulls': {
     colors: { primary: '#ED1E36', secondary: '#FFCD00', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/34/New_York_Red_Bulls_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747771783/assets/logos/mls-clubs/Club_Logo-RBNY_dwawvt.png',
   },
   'Philadelphia Union': {
     colors: { primary: '#002D55', secondary: '#B08D57', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9d/Philadelphia_Union_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769446/assets/logos/mls-clubs/Club_Logo-Philadelphia_im7pqg.png',
   },
   'Portland Timbers': {
     colors: { primary: '#004812', secondary: '#D69A00', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/Portland_Timbers_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769540/assets/logos/mls-clubs/Club_Logo-Portland_qihpaz.png',
   },
   'Columbus Crew': {
     colors: { primary: '#000000', secondary: '#FFE100', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/5f/Columbus_Crew_SC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500414/assets/logos/mls-clubs/Club_Logo-Columbus_light_z3eq8l.png',
   },
   'FC Cincinnati': {
     colors: { primary: '#003087', secondary: '#FE5000', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/1d/FC_Cincinnati_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500249/assets/logos/mls-clubs/Club_Logo-Cincinnati_jwgkps.png',
   },
   'Nashville SC': {
     colors: { primary: '#ECE83A', secondary: '#1F1646', text: '#1F1646' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Nashville_SC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755999/assets/logos/mls-clubs/Club_Logo-Nashville_rb9vwu.png',
   },
   'Orlando City SC': {
     colors: { primary: '#612B9B', secondary: '#FDE192', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c4/Orlando_City_SC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769281/assets/logos/mls-clubs/Club_Logo-Orlando_ryyn7a.png',
   },
   'Orlando City': {
     colors: { primary: '#612B9B', secondary: '#FDE192', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c4/Orlando_City_SC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769281/assets/logos/mls-clubs/Club_Logo-Orlando_ryyn7a.png',
   },
   'Toronto FC': {
     colors: { primary: '#B81137', secondary: '#455560', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d7/Toronto_FC_Logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748265251/assets/logos/mls-clubs/Club_Logo-Toronto_vz6hao.png',
   },
   'DC United': {
     colors: { primary: '#000000', secondary: '#EF3E42', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/85/D.C._United_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500504/assets/logos/mls-clubs/Club_Logo-D.C_t03ekm.png',
   },
   'D.C. United': {
     colors: { primary: '#000000', secondary: '#EF3E42', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/85/D.C._United_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500504/assets/logos/mls-clubs/Club_Logo-D.C_t03ekm.png',
   },
   'CF Montréal': {
     colors: { primary: '#0033A1', secondary: '#000000', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/CF_Montreal_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755806/assets/logos/mls-clubs/Club_Logo-Montreal_beeqnh.png',
   },
   'Chicago Fire FC': {
     colors: { primary: '#AF2626', secondary: '#0A174A', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Chicago_Fire_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500178/assets/logos/mls-clubs/Club_Logo-Chicago_jm2yev.png',
   },
   'Houston Dynamo FC': {
     colors: { primary: '#FF6B00', secondary: '#101820', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9c/Houston_Dynamo_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500939/assets/logos/mls-clubs/Club_Logo-Houston_oifm77.png',
   },
   'Sporting Kansas City': {
     colors: { primary: '#002F65', secondary: '#9BCBEB', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/4f/Sporting_Kansas_City_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747754918/assets/logos/mls-clubs/Club_Logo-Kansas_City_cnhd75.png',
   },
   'Minnesota United FC': {
     colors: { primary: '#231F20', secondary: '#9BCBEB', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Minnesota_United_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747754826/assets/logos/mls-clubs/Club_Logo-Minnesota_ftweor.png',
   },
   'Real Salt Lake': {
     colors: { primary: '#B30838', secondary: '#013A81', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f6/Real_Salt_Lake_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747776403/assets/logos/mls-clubs/Club_Logo-Salt_Lake_City_hpvde5.png',
   },
   'FC Dallas': {
     colors: { primary: '#BF0D3E', secondary: '#002D72', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/81/FC_Dallas_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500567/assets/logos/mls-clubs/Club_Logo-Dallas_sysmtj.png',
   },
   'Colorado Rapids': {
     colors: { primary: '#862633', secondary: '#8BB8E8', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/56/Colorado_Rapids_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500322/assets/logos/mls-clubs/Club_Logo-Colorado_n5kpss.png',
   },
   'Vancouver Whitecaps FC': {
     colors: { primary: '#00245E', secondary: '#9DC2EA', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/59/Vancouver_Whitecaps_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748265547/assets/logos/mls-clubs/Club_Logo-Vancouver_ao9phl.png',
   },
   'San Jose Earthquakes': {
     colors: { primary: '#0051BA', secondary: '#000000', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/54/San_Jose_Earthquakes_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748262048/assets/logos/mls-clubs/Club_Logo-San_Jose_opzlmo.png',
   },
   'Austin FC': {
     colors: { primary: '#00B140', secondary: '#000000', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Austin_FC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747499975/assets/logos/mls-clubs/Club_Logo-Austin_pa9xtu.png',
   },
   'St. Louis City SC': {
     colors: { primary: '#D22630', secondary: '#0A1E2C', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/St._Louis_City_SC_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747771858/assets/logos/mls-clubs/Club_Logo-Saint_Louis_guz12c.png',
   },
   'New England Revolution': {
     colors: { primary: '#002B5C', secondary: '#D80024', text: '#FFFFFF' },
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/New_England_Revolution_logo.svg',
+    logoUrl: 'https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1766020750/assets/NE_Logo_PRI_FC_RGB_480x480_fdx2us.png',
   },
 
   // La Liga - All 20 clubs

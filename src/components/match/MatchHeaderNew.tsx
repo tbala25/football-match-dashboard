@@ -58,6 +58,8 @@ export function MatchHeaderNew({
           src={logoUrl}
           alt={teamName}
           className="w-full h-full object-contain drop-shadow-md"
+          referrerPolicy="no-referrer"
+          loading="eager"
           onError={onError}
         />
       );
