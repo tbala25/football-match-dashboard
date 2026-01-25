@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { HomePage, SeasonPage, MatchPage } from './pages';
+import { HomePage, SeasonPage, MatchPageNew } from './pages';
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
             path="/competition/:competitionId/season/:seasonId"
             element={<SeasonPage />}
           />
-          <Route path="/match/:matchId" element={<MatchPage />} />
+          <Route path="/match/:matchId" element={<MatchPageNew />} />
         </Routes>
       </main>
 
