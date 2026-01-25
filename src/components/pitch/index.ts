@@ -3,5 +3,6 @@ export { PassNetwork } from './PassNetwork';
 export { VerticalPassNetwork } from './VerticalPassNetwork';
 export { ShotMap } from './ShotMap';
 export { CenteredShotMap } from './CenteredShotMap';
+export { TeamShotMap } from './TeamShotMap';
 export { Heatmap } from './Heatmap';
 export { TerritoryMap } from './TerritoryMap';

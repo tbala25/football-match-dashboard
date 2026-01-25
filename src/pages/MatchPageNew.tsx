@@ -7,7 +7,7 @@ import { PossessionTimeline } from '../components/match/PossessionTimeline';
 import { MatchStats } from '../components/match/MatchStats';
 import { VerticalPassNetwork } from '../components/pitch/VerticalPassNetwork';
 import { TerritoryMap } from '../components/pitch/TerritoryMap';
-import { CenteredShotMap } from '../components/pitch/CenteredShotMap';
+import { TeamShotMap } from '../components/pitch/TeamShotMap';
 import { Loading, ErrorMessage } from '../components/ui';
 import { buildPassNetwork, extractShots, getXGSummary } from '../lib/transformers';
 import { getTeamColors } from '../lib/teamColors';
@@ -50,6 +50,15 @@ export function MatchPageNew() {
     if (!events) return [];
     return extractShots(events);
   }, [events]);
+
+  // Separate shots by team
+  const homeShots = useMemo(() => {
+    return shots.filter((s) => s.teamId === homeTeamId);
+  }, [shots, homeTeamId]);
+
+  const awayShots = useMemo(() => {
+    return shots.filter((s) => s.teamId === awayTeamId);
+  }, [shots, awayTeamId]);
 
   const xgSummary = useMemo(() => {
     if (!events || !homeTeamId || !awayTeamId) return null;
@@ -167,17 +176,25 @@ export function MatchPageNew() {
             />
           )}
 
-          {/* Shot map */}
-          {shots.length > 0 && homeTeamId && awayTeamId && (
-            <CenteredShotMap
-              shots={shots}
-              homeTeamId={homeTeamId}
-              awayTeamId={awayTeamId}
-              homeXG={xgSummary?.home.xg ?? 0}
-              awayXG={xgSummary?.away.xg ?? 0}
-              homeColor={homeColor}
-              awayColor={awayColor}
-            />
+          {/* Shot maps - side by side */}
+          {(homeShots.length > 0 || awayShots.length > 0) && (
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 text-center">Shot Maps</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <TeamShotMap
+                  shots={homeShots}
+                  teamColor={homeColor}
+                  teamName={homeTeamName}
+                  isAwayTeam={false}
+                />
+                <TeamShotMap
+                  shots={awayShots}
+                  teamColor={awayColor}
+                  teamName={awayTeamName}
+                  isAwayTeam={true}
+                />
+              </div>
+            </div>
           )}
         </div>
 

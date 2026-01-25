@@ -6,6 +6,7 @@ import { PassNetwork, ShotMap, Heatmap } from '../components/pitch';
 import { Tabs } from '../components/ui';
 import { Loading, ErrorMessage } from '../components/ui';
 import { buildPassNetwork, buildTouchHeatmap, extractShots, getXGSummary } from '../lib/transformers';
+import { getTeamColors } from '../lib/teamColors';
 import type { Match } from '../types/statsbomb';
 
 export function MatchPage() {
@@ -28,6 +29,12 @@ export function MatchPage() {
   const awayTeamId = match?.away_team?.away_team_id ?? match?.away_team?.team_id;
   const homeTeamName = match?.home_team?.home_team_name ?? match?.home_team?.team_name ?? 'Home';
   const awayTeamName = match?.away_team?.away_team_name ?? match?.away_team?.team_name ?? 'Away';
+
+  // Get dynamic team colors
+  const homeColors = useMemo(() => getTeamColors(homeTeamName), [homeTeamName]);
+  const awayColors = useMemo(() => getTeamColors(awayTeamName), [awayTeamName]);
+  const homeColor = homeColors.primary;
+  const awayColor = awayColors.primary;
 
   // Build visualization data
   const homePassNetwork = useMemo(() => {
@@ -102,6 +109,8 @@ export function MatchPage() {
           shots={shots}
           homeTeamId={homeTeamId!}
           awayTeamId={awayTeamId!}
+          homeColor={homeColor}
+          awayColor={awayColor}
           showXGLabels
         />
       ),
@@ -110,7 +119,7 @@ export function MatchPage() {
       id: 'home-passes',
       label: `${homeTeamName} Passes`,
       content: homePassNetwork ? (
-        <PassNetwork data={homePassNetwork} teamColor="#1e40af" />
+        <PassNetwork data={homePassNetwork} teamColor={homeColor} />
       ) : (
         <div className="text-gray-500">No pass data available</div>
       ),
@@ -119,7 +128,7 @@ export function MatchPage() {
       id: 'away-passes',
       label: `${awayTeamName} Passes`,
       content: awayPassNetwork ? (
-        <PassNetwork data={awayPassNetwork} teamColor="#dc2626" />
+        <PassNetwork data={awayPassNetwork} teamColor={awayColor} />
       ) : (
         <div className="text-gray-500">No pass data available</div>
       ),
@@ -128,7 +137,7 @@ export function MatchPage() {
       id: 'home-heatmap',
       label: `${homeTeamName} Touches`,
       content: homeHeatmap ? (
-        <Heatmap data={homeHeatmap} teamColor="#1e40af" />
+        <Heatmap data={homeHeatmap} teamColor={homeColor} />
       ) : (
         <div className="text-gray-500">No touch data available</div>
       ),
@@ -137,7 +146,7 @@ export function MatchPage() {
       id: 'away-heatmap',
       label: `${awayTeamName} Touches`,
       content: awayHeatmap ? (
-        <Heatmap data={awayHeatmap} teamColor="#dc2626" />
+        <Heatmap data={awayHeatmap} teamColor={awayColor} />
       ) : (
         <div className="text-gray-500">No touch data available</div>
       ),
@@ -183,6 +192,8 @@ export function MatchPage() {
               awayTeamId={awayTeamId!}
               homeTeamName={homeTeamName}
               awayTeamName={awayTeamName}
+              homeColor={homeColor}
+              awayColor={awayColor}
             />
           )}
         </div>

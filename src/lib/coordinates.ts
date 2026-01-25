@@ -117,3 +117,109 @@ export function distance(x1: number, y1: number, x2: number, y2: number): number
 export function angleDegrees(x1: number, y1: number, x2: number, y2: number): number {
   return (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
 }
+
+// Rotated coordinate mapper for goal-at-top view (90° rotation)
+// This is used for individual team shot maps where the goal is at the top
+export interface RotatedCoordinateMapper {
+  toViewport: (x: number, y: number) => { x: number; y: number };
+  fromViewport: (x: number, y: number) => { x: number; y: number };
+  scale: { x: number; y: number };
+}
+
+export interface RotatedViewportConfig {
+  width: number;    // Viewport width
+  height: number;   // Viewport height
+  isAwayTeam?: boolean; // If true, flip for away team perspective
+}
+
+/**
+ * Creates a coordinate mapper for rotated half-pitch view (goal at top)
+ *
+ * StatsBomb coordinates: x: 0-120 (left to right), y: 0-80 (bottom to top)
+ * Goal is at x=120 for attacking team
+ *
+ * For this view:
+ * - We only show the attacking half (x: 60-120)
+ * - The goal should be at the TOP of the viewport
+ * - Y axis is preserved (0-80 maps to left-right in rotated view)
+ *
+ * Transformation:
+ * - Original x (60-120) maps to viewport y (top to bottom, goal at top)
+ * - Original y (0-80) maps to viewport x (left to right)
+ */
+export function createRotatedCoordinateMapper(config: RotatedViewportConfig): RotatedCoordinateMapper {
+  const { width, height, isAwayTeam = false } = config;
+
+  // We're mapping the attacking half: x from 60 to 120 (60 yard range)
+  // and y from 0 to 80 (full width)
+  const halfPitchLength = 60; // x: 60-120
+  const pitchWidth = STATSBOMB_PITCH.height; // y: 0-80
+
+  // Scale factors
+  const scaleX = width / pitchWidth; // Original y maps to viewport x
+  const scaleY = height / halfPitchLength; // Original x (60-120) maps to viewport y
+
+  return {
+    toViewport: (x: number, y: number) => {
+      // Transform coordinates:
+      // - Original y (0-80) -> Viewport x (0-width)
+      // - Original x (60-120) -> Viewport y (height to 0, goal at top)
+
+      // For home team (attacking right): x=120 is at top (y=0 in viewport)
+      // For away team (attacking left): need to flip
+
+      let viewportX: number;
+      let viewportY: number;
+
+      if (isAwayTeam) {
+        // Away team attacks left (goal at x=0), but we flip to show goal at top
+        // Original x: 0-60 -> Viewport y: 0-height (goal at top)
+        viewportX = (pitchWidth - y) * scaleX; // Flip y for mirror view
+        viewportY = x * scaleY; // x: 0 at top
+      } else {
+        // Home team attacks right (goal at x=120)
+        // Original x: 60-120 -> Viewport y: 0-height (120 at top)
+        viewportX = y * scaleX;
+        viewportY = (120 - x) * scaleY; // 120 maps to 0 (top), 60 maps to height (bottom)
+      }
+
+      return { x: viewportX, y: viewportY };
+    },
+
+    fromViewport: (viewportX: number, viewportY: number) => {
+      let x: number;
+      let y: number;
+
+      if (isAwayTeam) {
+        y = pitchWidth - (viewportX / scaleX);
+        x = viewportY / scaleY;
+      } else {
+        y = viewportX / scaleX;
+        x = 120 - (viewportY / scaleY);
+      }
+
+      return { x, y };
+    },
+
+    scale: { x: scaleX, y: scaleY },
+  };
+}
+
+// Half-pitch dimensions for rotated view
+export const HALF_PITCH = {
+  // Original coords for attacking half
+  xMin: 60,
+  xMax: 120,
+  yMin: 0,
+  yMax: 80,
+  // Key markings (in original coords)
+  penaltyAreaX: 120 - STATSBOMB_PITCH.penaltyAreaDepth, // 102
+  penaltyAreaYMin: (80 - STATSBOMB_PITCH.penaltyAreaWidth) / 2, // 18
+  penaltyAreaYMax: (80 + STATSBOMB_PITCH.penaltyAreaWidth) / 2, // 62
+  goalAreaX: 120 - STATSBOMB_PITCH.goalAreaDepth, // 114
+  goalAreaYMin: (80 - STATSBOMB_PITCH.goalAreaWidth) / 2, // 30
+  goalAreaYMax: (80 + STATSBOMB_PITCH.goalAreaWidth) / 2, // 50
+  penaltySpotX: 120 - STATSBOMB_PITCH.penaltySpotDistance, // 108
+  goalYMin: (80 - STATSBOMB_PITCH.goalWidth) / 2, // 36
+  goalYMax: (80 + STATSBOMB_PITCH.goalWidth) / 2, // 44
+};

@@ -9,6 +9,8 @@ interface TimelineProps {
   awayTeamId: number;
   homeTeamName: string;
   awayTeamName: string;
+  homeColor?: string;
+  awayColor?: string;
   className?: string;
 }
 
@@ -18,6 +20,8 @@ export function Timeline({
   awayTeamId,
   homeTeamName,
   awayTeamName,
+  homeColor = '#1e40af',
+  awayColor = '#dc2626',
   className = '',
 }: TimelineProps) {
   const xgTimeline = useMemo(
@@ -53,6 +57,8 @@ export function Timeline({
           away={`${possession.away}%`}
           homeValue={possession.home}
           awayValue={possession.away}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatComparison
           label="xG"
@@ -60,6 +66,8 @@ export function Timeline({
           away={xgSummary.away.xg.toFixed(2)}
           homeValue={xgSummary.home.xg}
           awayValue={xgSummary.away.xg}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatComparison
           label="Shots"
@@ -67,6 +75,8 @@ export function Timeline({
           away={xgSummary.away.shots.toString()}
           homeValue={xgSummary.home.shots}
           awayValue={xgSummary.away.shots}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatComparison
           label="On Target"
@@ -74,6 +84,8 @@ export function Timeline({
           away={xgSummary.away.onTarget.toString()}
           homeValue={xgSummary.home.onTarget}
           awayValue={xgSummary.away.onTarget}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
       </div>
 
@@ -86,41 +98,56 @@ export function Timeline({
           maxXG={maxXG}
           homeTeamName={homeTeamName}
           awayTeamName={awayTeamName}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
       </div>
 
       {/* Key events list */}
       <div>
         <h4 className="text-sm text-gray-500 mb-2">Key Events</h4>
-        <div className="space-y-1 max-h-48 overflow-y-auto">
-          {xgTimeline
-            .filter((p) => p.event)
-            .map((point, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-2 text-sm py-1 px-2 rounded ${
-                  point.event?.isGoal ? 'bg-green-50' : 'bg-gray-50'
-                }`}
-              >
-                <span className="w-8 text-gray-400">{point.minute}'</span>
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    point.event?.team === 'home'
-                      ? 'bg-team-home'
-                      : 'bg-team-away'
-                  }`}
-                />
-                <span className="flex-1">{point.event?.player}</span>
-                <span className="text-gray-500">
-                  xG: {point.event?.xg.toFixed(2)}
-                </span>
-                {point.event?.isGoal && (
-                  <span className="text-green-600 font-bold">GOAL!</span>
-                )}
-              </div>
-            ))}
-        </div>
+        <KeyEventsList
+          xgTimeline={xgTimeline}
+          homeColor={homeColor}
+          awayColor={awayColor}
+        />
       </div>
+    </div>
+  );
+}
+
+interface KeyEventsListProps {
+  xgTimeline: XGTimelinePoint[];
+  homeColor: string;
+  awayColor: string;
+}
+
+function KeyEventsList({ xgTimeline, homeColor, awayColor }: KeyEventsListProps) {
+  return (
+    <div className="space-y-1 max-h-48 overflow-y-auto">
+      {xgTimeline
+        .filter((p) => p.event)
+        .map((point, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-2 text-sm py-1 px-2 rounded ${
+              point.event?.isGoal ? 'bg-green-50' : 'bg-gray-50'
+            }`}
+          >
+            <span className="w-8 text-gray-400">{point.minute}'</span>
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: point.event?.team === 'home' ? homeColor : awayColor }}
+            />
+            <span className="flex-1">{point.event?.player}</span>
+            <span className="text-gray-500">
+              xG: {point.event?.xg.toFixed(2)}
+            </span>
+            {point.event?.isGoal && (
+              <span className="text-green-600 font-bold">GOAL!</span>
+            )}
+          </div>
+        ))}
     </div>
   );
 }
@@ -131,9 +158,11 @@ interface StatComparisonProps {
   away: string;
   homeValue: number;
   awayValue: number;
+  homeColor: string;
+  awayColor: string;
 }
 
-function StatComparison({ label, home, away, homeValue, awayValue }: StatComparisonProps) {
+function StatComparison({ label, home, away, homeValue, awayValue, homeColor, awayColor }: StatComparisonProps) {
   const total = homeValue + awayValue || 1;
   const homeWidth = (homeValue / total) * 100;
 
@@ -141,14 +170,14 @@ function StatComparison({ label, home, away, homeValue, awayValue }: StatCompari
     <div className="text-center">
       <div className="text-xs text-gray-500 mb-1">{label}</div>
       <div className="flex items-center gap-2">
-        <span className="w-10 text-right font-semibold text-team-home">{home}</span>
+        <span className="w-10 text-right font-semibold" style={{ color: homeColor }}>{home}</span>
         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-team-home transition-all"
-            style={{ width: `${homeWidth}%` }}
+            className="h-full transition-all"
+            style={{ width: `${homeWidth}%`, backgroundColor: homeColor }}
           />
         </div>
-        <span className="w-10 text-left font-semibold text-team-away">{away}</span>
+        <span className="w-10 text-left font-semibold" style={{ color: awayColor }}>{away}</span>
       </div>
     </div>
   );
@@ -160,9 +189,11 @@ interface XGChartProps {
   maxXG: number;
   homeTeamName: string;
   awayTeamName: string;
+  homeColor: string;
+  awayColor: string;
 }
 
-function XGChart({ timeline, maxMinute, maxXG, homeTeamName, awayTeamName }: XGChartProps) {
+function XGChart({ timeline, maxMinute, maxXG, homeTeamName, awayTeamName, homeColor, awayColor }: XGChartProps) {
   const width = 100;
   const height = 60;
   const padding = { top: 5, right: 5, bottom: 15, left: 25 };
@@ -225,13 +256,13 @@ function XGChart({ timeline, maxMinute, maxXG, homeTeamName, awayTeamName }: XGC
       <path
         d={buildPath('homeXG')}
         fill="none"
-        stroke="#1e40af"
+        stroke={homeColor}
         strokeWidth={1.5}
       />
       <path
         d={buildPath('awayXG')}
         fill="none"
-        stroke="#dc2626"
+        stroke={awayColor}
         strokeWidth={1.5}
       />
 
@@ -244,7 +275,7 @@ function XGChart({ timeline, maxMinute, maxXG, homeTeamName, awayTeamName }: XGC
             cx={xScale(point.minute)}
             cy={yScale(point.event?.team === 'home' ? point.homeXG : point.awayXG)}
             r={2}
-            fill={point.event?.team === 'home' ? '#1e40af' : '#dc2626'}
+            fill={point.event?.team === 'home' ? homeColor : awayColor}
             stroke="#fff"
             strokeWidth={0.5}
           />
@@ -265,10 +296,10 @@ function XGChart({ timeline, maxMinute, maxXG, homeTeamName, awayTeamName }: XGC
 
       {/* Legend */}
       <g transform={`translate(${padding.left + 2}, ${padding.top + 2})`}>
-        <line x1={0} y1={0} x2={4} y2={0} stroke="#1e40af" strokeWidth={1} />
-        <text x={5} y={1} fontSize={2.5} fill="#1e40af">{homeTeamName}</text>
-        <line x1={0} y1={4} x2={4} y2={4} stroke="#dc2626" strokeWidth={1} />
-        <text x={5} y={5} fontSize={2.5} fill="#dc2626">{awayTeamName}</text>
+        <line x1={0} y1={0} x2={4} y2={0} stroke={homeColor} strokeWidth={1} />
+        <text x={5} y={1} fontSize={2.5} fill={homeColor}>{homeTeamName}</text>
+        <line x1={0} y1={4} x2={4} y2={4} stroke={awayColor} strokeWidth={1} />
+        <text x={5} y={5} fontSize={2.5} fill={awayColor}>{awayTeamName}</text>
       </g>
     </svg>
   );
