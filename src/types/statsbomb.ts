@@ -67,15 +67,24 @@ export interface Match {
 }
 
 export interface Team {
-  team_id: number;
-  team_name: string;
-  team_gender: string;
-  team_group: string | null;
-  country: {
+  // StatsBomb uses prefixed names in match context (home_team_id, away_team_id)
+  team_id?: number;
+  home_team_id?: number;
+  away_team_id?: number;
+  team_name?: string;
+  home_team_name?: string;
+  away_team_name?: string;
+  team_gender?: string;
+  home_team_gender?: string;
+  away_team_gender?: string;
+  team_group?: string | null;
+  home_team_group?: string | null;
+  away_team_group?: string | null;
+  country?: {
     id: number;
     name: string;
   };
-  managers: Manager[];
+  managers?: Manager[];
 }
 
 export interface Manager {

@@ -18,6 +18,10 @@ export function MatchHeader({ match, homeXG, awayXG, className = '' }: MatchHead
     });
   };
 
+  // StatsBomb uses prefixed field names
+  const homeTeamName = match.home_team?.home_team_name ?? match.home_team?.team_name ?? 'Home Team';
+  const awayTeamName = match.away_team?.away_team_name ?? match.away_team?.team_name ?? 'Away Team';
+
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
       {/* Competition and date */}
@@ -35,9 +39,9 @@ export function MatchHeader({ match, homeXG, awayXG, className = '' }: MatchHead
         {/* Home team */}
         <div className="flex-1 text-right">
           <div className="text-xl font-bold text-gray-900">
-            {match.home_team.team_name}
+            {homeTeamName}
           </div>
-          {match.home_team.managers?.[0] && (
+          {match.home_team?.managers?.[0] && (
             <div className="text-xs text-gray-400 mt-1">
               {match.home_team.managers[0].name}
             </div>
@@ -58,9 +62,9 @@ export function MatchHeader({ match, homeXG, awayXG, className = '' }: MatchHead
         {/* Away team */}
         <div className="flex-1 text-left">
           <div className="text-xl font-bold text-gray-900">
-            {match.away_team.team_name}
+            {awayTeamName}
           </div>
-          {match.away_team.managers?.[0] && (
+          {match.away_team?.managers?.[0] && (
             <div className="text-xs text-gray-400 mt-1">
               {match.away_team.managers[0].name}
             </div>

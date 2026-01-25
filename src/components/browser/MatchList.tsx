@@ -3,6 +3,15 @@ import { Link, useParams } from 'react-router-dom';
 import { useMatches, useCompetitions } from '../../lib/api';
 import type { Match } from '../../types/statsbomb';
 
+// Helper to get team name from StatsBomb data (handles both naming conventions)
+function getTeamNameFromMatch(match: Match, type: 'home' | 'away'): string {
+  const team = type === 'home' ? match.home_team : match.away_team;
+  if (type === 'home') {
+    return team?.home_team_name ?? team?.team_name ?? 'Home';
+  }
+  return team?.away_team_name ?? team?.team_name ?? 'Away';
+}
+
 interface MatchListProps {
   className?: string;
 }
@@ -40,8 +49,8 @@ export function MatchList({ className = '' }: MatchListProps) {
       const term = searchTerm.toLowerCase();
       filtered = matches.filter(
         (m) =>
-          m.home_team.team_name.toLowerCase().includes(term) ||
-          m.away_team.team_name.toLowerCase().includes(term)
+          getTeamNameFromMatch(m, 'home').toLowerCase().includes(term) ||
+          getTeamNameFromMatch(m, 'away').toLowerCase().includes(term)
       );
     }
 
@@ -50,9 +59,9 @@ export function MatchList({ className = '' }: MatchListProps) {
         case 'date':
           return new Date(b.match_date).getTime() - new Date(a.match_date).getTime();
         case 'home':
-          return a.home_team.team_name.localeCompare(b.home_team.team_name);
+          return getTeamNameFromMatch(a, 'home').localeCompare(getTeamNameFromMatch(b, 'home'));
         case 'away':
-          return a.away_team.team_name.localeCompare(b.away_team.team_name);
+          return getTeamNameFromMatch(a, 'away').localeCompare(getTeamNameFromMatch(b, 'away'));
         default:
           return 0;
       }
@@ -179,6 +188,9 @@ function MatchCard({ match }: MatchCardProps) {
     });
   };
 
+  const homeTeamName = getTeamNameFromMatch(match, 'home');
+  const awayTeamName = getTeamNameFromMatch(match, 'away');
+
   return (
     <Link
       to={`/match/${match.match_id}`}
@@ -197,7 +209,7 @@ function MatchCard({ match }: MatchCardProps) {
         {/* Teams and score */}
         <div className="flex-1 flex items-center justify-center gap-4">
           <div className="flex-1 text-right">
-            <span className="font-medium">{match.home_team.team_name}</span>
+            <span className="font-medium">{homeTeamName}</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded font-bold">
             <span className="text-team-home">{match.home_score}</span>
@@ -205,7 +217,7 @@ function MatchCard({ match }: MatchCardProps) {
             <span className="text-team-away">{match.away_score}</span>
           </div>
           <div className="flex-1 text-left">
-            <span className="font-medium">{match.away_team.team_name}</span>
+            <span className="font-medium">{awayTeamName}</span>
           </div>
         </div>
 

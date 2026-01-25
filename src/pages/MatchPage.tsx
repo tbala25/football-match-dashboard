@@ -23,8 +23,11 @@ export function MatchPage() {
   // For simplicity, we'll use the match from location state
   const match = matchFromState;
 
-  const homeTeamId = match?.home_team.team_id;
-  const awayTeamId = match?.away_team.team_id;
+  // StatsBomb uses prefixed field names (home_team_id, home_team_name, etc.)
+  const homeTeamId = match?.home_team?.home_team_id ?? match?.home_team?.team_id;
+  const awayTeamId = match?.away_team?.away_team_id ?? match?.away_team?.team_id;
+  const homeTeamName = match?.home_team?.home_team_name ?? match?.home_team?.team_name ?? 'Home';
+  const awayTeamName = match?.away_team?.away_team_name ?? match?.away_team?.team_name ?? 'Away';
 
   // Build visualization data
   const homePassNetwork = useMemo(() => {
@@ -105,7 +108,7 @@ export function MatchPage() {
     },
     {
       id: 'home-passes',
-      label: `${match.home_team.team_name} Passes`,
+      label: `${homeTeamName} Passes`,
       content: homePassNetwork ? (
         <PassNetwork data={homePassNetwork} teamColor="#1e40af" />
       ) : (
@@ -114,7 +117,7 @@ export function MatchPage() {
     },
     {
       id: 'away-passes',
-      label: `${match.away_team.team_name} Passes`,
+      label: `${awayTeamName} Passes`,
       content: awayPassNetwork ? (
         <PassNetwork data={awayPassNetwork} teamColor="#dc2626" />
       ) : (
@@ -123,7 +126,7 @@ export function MatchPage() {
     },
     {
       id: 'home-heatmap',
-      label: `${match.home_team.team_name} Touches`,
+      label: `${homeTeamName} Touches`,
       content: homeHeatmap ? (
         <Heatmap data={homeHeatmap} teamColor="#1e40af" />
       ) : (
@@ -132,7 +135,7 @@ export function MatchPage() {
     },
     {
       id: 'away-heatmap',
-      label: `${match.away_team.team_name} Touches`,
+      label: `${awayTeamName} Touches`,
       content: awayHeatmap ? (
         <Heatmap data={awayHeatmap} teamColor="#dc2626" />
       ) : (
@@ -178,8 +181,8 @@ export function MatchPage() {
               events={events}
               homeTeamId={homeTeamId!}
               awayTeamId={awayTeamId!}
-              homeTeamName={match.home_team.team_name}
-              awayTeamName={match.away_team.team_name}
+              homeTeamName={homeTeamName}
+              awayTeamName={awayTeamName}
             />
           )}
         </div>
