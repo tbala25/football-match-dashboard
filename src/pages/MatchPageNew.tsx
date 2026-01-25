@@ -10,6 +10,7 @@ import { TerritoryMap } from '../components/pitch/TerritoryMap';
 import { CenteredShotMap } from '../components/pitch/CenteredShotMap';
 import { Loading, ErrorMessage } from '../components/ui';
 import { buildPassNetwork, extractShots, getXGSummary } from '../lib/transformers';
+import { getTeamColors } from '../lib/teamColors';
 import type { Match } from '../types/statsbomb';
 
 export function MatchPageNew() {
@@ -28,9 +29,11 @@ export function MatchPageNew() {
   const homeTeamName = match?.home_team?.home_team_name ?? match?.home_team?.team_name ?? 'Home';
   const awayTeamName = match?.away_team?.away_team_name ?? match?.away_team?.team_name ?? 'Away';
 
-  // Team colors - could be made dynamic based on team
-  const homeColor = '#EF0107'; // Red
-  const awayColor = '#6CABDD'; // Light blue
+  // Get dynamic team colors based on team name
+  const homeColors = useMemo(() => getTeamColors(homeTeamName), [homeTeamName]);
+  const awayColors = useMemo(() => getTeamColors(awayTeamName), [awayTeamName]);
+  const homeColor = homeColors.primary;
+  const awayColor = awayColors.primary;
 
   // Build visualization data
   const homePassNetwork = useMemo(() => {

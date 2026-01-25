@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { Match } from '../../types/statsbomb';
+import { getTeamBranding } from '../../lib/teamColors';
 
 interface MatchHeaderProps {
   match: Match;
@@ -15,6 +17,14 @@ export function MatchHeaderNew({
 }: MatchHeaderProps) {
   const homeTeamName = match.home_team?.home_team_name ?? match.home_team?.team_name ?? 'Home';
   const awayTeamName = match.away_team?.away_team_name ?? match.away_team?.team_name ?? 'Away';
+
+  // Get team branding including logo URLs
+  const homeBranding = getTeamBranding(homeTeamName);
+  const awayBranding = getTeamBranding(awayTeamName);
+
+  // Track logo load errors to show fallback
+  const [homeLogoError, setHomeLogoError] = useState(false);
+  const [awayLogoError, setAwayLogoError] = useState(false);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -45,12 +55,23 @@ export function MatchHeaderNew({
 
       {/* Score section */}
       <div className="bg-white py-4 px-6 flex items-center justify-center gap-8">
-        {/* Home team logo placeholder */}
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xs"
-          style={{ backgroundColor: homeColor }}
-        >
-          {homeTeamName.substring(0, 3).toUpperCase()}
+        {/* Home team logo */}
+        <div className="w-14 h-14 flex items-center justify-center">
+          {homeBranding.logoUrl && !homeLogoError ? (
+            <img
+              src={homeBranding.logoUrl}
+              alt={homeTeamName}
+              className="w-14 h-14 object-contain"
+              onError={() => setHomeLogoError(true)}
+            />
+          ) : (
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xs"
+              style={{ backgroundColor: homeColor }}
+            >
+              {homeTeamName.substring(0, 3).toUpperCase()}
+            </div>
+          )}
         </div>
 
         {/* Score */}
@@ -66,12 +87,23 @@ export function MatchHeaderNew({
           </div>
         </div>
 
-        {/* Away team logo placeholder */}
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xs"
-          style={{ backgroundColor: awayColor }}
-        >
-          {awayTeamName.substring(0, 3).toUpperCase()}
+        {/* Away team logo */}
+        <div className="w-14 h-14 flex items-center justify-center">
+          {awayBranding.logoUrl && !awayLogoError ? (
+            <img
+              src={awayBranding.logoUrl}
+              alt={awayTeamName}
+              className="w-14 h-14 object-contain"
+              onError={() => setAwayLogoError(true)}
+            />
+          ) : (
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xs"
+              style={{ backgroundColor: awayColor }}
+            >
+              {awayTeamName.substring(0, 3).toUpperCase()}
+            </div>
+          )}
         </div>
       </div>
     </div>
