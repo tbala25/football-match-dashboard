@@ -31,7 +31,7 @@ export function LineupTable({
     'Left Back': 3, 'LB': 3,
     'Right Wing Back': 1, 'RWB': 1,
     'Left Wing Back': 3, 'LWB': 3,
-    'Defensive Midfield': 4, 'DM': 4, 'CDM': 4,
+    'Defensive Midfield': 4, 'DM': 4, 'CDM': 4, 'Center Defensive Midfield': 4,
     'Right Defensive Midfield': 4, 'RDM': 4,
     'Left Defensive Midfield': 4, 'LDM': 4,
     'Center Midfield': 5, 'CM': 5,
