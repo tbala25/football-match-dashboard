@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import type { DefensiveAction, DefensiveActionType } from '../../lib/transformers/defensiveActions';
 import { Pitch } from './Pitch';
 import type { CoordinateMapper } from '../../lib/coordinates';
@@ -13,12 +13,13 @@ interface DefensiveActionsMapProps {
   className?: string;
 }
 
-const ACTION_COLORS: Record<DefensiveActionType, string> = {
-  tackle: '#22c55e',      // Green
-  interception: '#3b82f6', // Blue
-  recovery: '#f59e0b',     // Orange
-  clearance: '#8b5cf6',    // Purple
-  block: '#ef4444',        // Red
+// Gradient color stops for 3D depth effect
+const GRADIENT_COLORS: Record<DefensiveActionType, { light: string; dark: string }> = {
+  tackle: { light: '#4ade80', dark: '#15803d' },
+  interception: { light: '#60a5fa', dark: '#1d4ed8' },
+  recovery: { light: '#fbbf24', dark: '#b45309' },
+  clearance: { light: '#a78bfa', dark: '#5b21b6' },
+  block: { light: '#f87171', dark: '#b91c1c' },
 };
 
 const ACTION_LABELS: Record<DefensiveActionType, string> = {
@@ -29,60 +30,134 @@ const ACTION_LABELS: Record<DefensiveActionType, string> = {
   block: 'Blocks',
 };
 
-// SVG marker shapes for each action type
+// SVG gradient and filter definitions
+function SvgDefs() {
+  return (
+    <defs>
+      {/* Radial gradients for each action type */}
+      {(Object.keys(GRADIENT_COLORS) as DefensiveActionType[]).map((type) => (
+        <radialGradient key={type} id={`grad-${type}`} cx="30%" cy="30%">
+          <stop offset="0%" stopColor={GRADIENT_COLORS[type].light} />
+          <stop offset="100%" stopColor={GRADIENT_COLORS[type].dark} />
+        </radialGradient>
+      ))}
+
+      {/* Drop shadow filter */}
+      <filter id="marker-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0.5" dy="1" stdDeviation="1" floodOpacity="0.35" />
+      </filter>
+
+      {/* Glow filter for hover state */}
+      <filter id="marker-glow" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="2" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+  );
+}
+
+// SVG marker shapes with gradient fills
 function ActionMarker({
   type,
   x,
   y,
-  color,
   size = 6,
+  isHovered = false,
 }: {
   type: DefensiveActionType;
   x: number;
   y: number;
-  color: string;
   size?: number;
+  isHovered?: boolean;
 }) {
+  const gradientId = `grad-${type}`;
+  const filterId = isHovered ? 'marker-glow' : 'marker-shadow';
+  const scale = isHovered ? 1.2 : 1;
+
+  const transform = `translate(${x}, ${y}) scale(${scale})`;
+
   switch (type) {
     case 'tackle':
-      // Filled circle
-      return <circle cx={x} cy={y} r={size} fill={color} />;
+      return (
+        <circle
+          r={size}
+          fill={`url(#${gradientId})`}
+          filter={`url(#${filterId})`}
+          transform={transform}
+          style={{ transformOrigin: `${x}px ${y}px`, transition: 'transform 0.15s ease-out' }}
+        />
+      );
     case 'interception':
-      // Diamond
       return (
         <polygon
-          points={`${x},${y - size} ${x + size},${y} ${x},${y + size} ${x - size},${y}`}
-          fill={color}
+          points={`0,${-size} ${size},0 0,${size} ${-size},0`}
+          fill={`url(#${gradientId})`}
+          filter={`url(#${filterId})`}
+          transform={transform}
+          style={{ transformOrigin: `${x}px ${y}px`, transition: 'transform 0.15s ease-out' }}
         />
       );
     case 'recovery':
-      // Triangle pointing up
       return (
         <polygon
-          points={`${x},${y - size} ${x + size},${y + size * 0.6} ${x - size},${y + size * 0.6}`}
-          fill={color}
+          points={`0,${-size} ${size},${size * 0.6} ${-size},${size * 0.6}`}
+          fill={`url(#${gradientId})`}
+          filter={`url(#${filterId})`}
+          transform={transform}
+          style={{ transformOrigin: `${x}px ${y}px`, transition: 'transform 0.15s ease-out' }}
         />
       );
     case 'clearance':
-      // Square
       return (
         <rect
-          x={x - size * 0.7}
-          y={y - size * 0.7}
+          x={-size * 0.7}
+          y={-size * 0.7}
           width={size * 1.4}
           height={size * 1.4}
-          fill={color}
+          fill={`url(#${gradientId})`}
+          filter={`url(#${filterId})`}
+          transform={transform}
+          style={{ transformOrigin: `${x}px ${y}px`, transition: 'transform 0.15s ease-out' }}
         />
       );
     case 'block':
-      // X marker
       return (
-        <g stroke={color} strokeWidth={2.5} strokeLinecap="round">
-          <line x1={x - size} y1={y - size} x2={x + size} y2={y + size} />
-          <line x1={x + size} y1={y - size} x2={x - size} y2={y + size} />
+        <g
+          filter={`url(#${filterId})`}
+          transform={transform}
+          style={{ transformOrigin: `${x}px ${y}px`, transition: 'transform 0.15s ease-out' }}
+        >
+          <line
+            x1={-size}
+            y1={-size}
+            x2={size}
+            y2={size}
+            stroke={`url(#${gradientId})`}
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
+          <line
+            x1={size}
+            y1={-size}
+            x2={-size}
+            y2={size}
+            stroke={`url(#${gradientId})`}
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
         </g>
       );
   }
+}
+
+interface TooltipState {
+  visible: boolean;
+  x: number;
+  y: number;
+  action: DefensiveAction | null;
 }
 
 function TeamDefensiveMap({
@@ -91,18 +166,23 @@ function TeamDefensiveMap({
   teamColor,
   filters,
   isAway,
+  onHover,
+  hoveredId,
 }: {
   actions: DefensiveAction[];
   teamName: string;
   teamColor: string;
   filters: Set<DefensiveActionType>;
   isAway: boolean;
+  onHover: (action: DefensiveAction | null, x: number, y: number) => void;
+  hoveredId: string | null;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const filteredActions = useMemo(() => {
     return actions.filter((a) => filters.has(a.type));
   }, [actions, filters]);
 
-  // Count actions by type for summary
   const actionCounts = useMemo(() => {
     const counts: Record<DefensiveActionType, number> = {
       tackle: 0,
@@ -117,46 +197,50 @@ function TeamDefensiveMap({
     return counts;
   }, [actions]);
 
+  const totalActions = actions.length;
+
   return (
-    <div>
-      <h4
-        className="text-sm font-semibold mb-2 text-center"
-        style={{ color: teamColor }}
-      >
+    <div ref={containerRef}>
+      <h4 className="text-sm font-semibold mb-2 text-center" style={{ color: teamColor }}>
         {teamName}
       </h4>
       <Pitch>
         {(mapper: CoordinateMapper) => (
           <g className="defensive-actions">
+            <SvgDefs />
             {filteredActions.map((action) => {
-              // Mirror x coordinate for away team (attacking right to left)
               const x = isAway ? 120 - action.x : action.x;
               const pos = mapper.toViewport(x, action.y);
+              const isHovered = hoveredId === action.id;
+
               return (
-                <g key={action.id} className="cursor-pointer">
+                <g
+                  key={action.id}
+                  className="cursor-pointer"
+                  onMouseEnter={(e) => {
+                    const rect = containerRef.current?.getBoundingClientRect();
+                    if (rect) {
+                      onHover(action, e.clientX, e.clientY);
+                    }
+                  }}
+                  onMouseLeave={() => onHover(null, 0, 0)}
+                >
                   <ActionMarker
                     type={action.type}
                     x={pos.x}
                     y={pos.y}
-                    color={ACTION_COLORS[action.type]}
                     size={5}
+                    isHovered={isHovered}
                   />
-                  <title>
-                    {`${action.playerName}\n${action.minute}' - ${ACTION_LABELS[action.type]}${action.outcome ? ` (${action.outcome})` : ''}`}
-                  </title>
                 </g>
               );
             })}
           </g>
         )}
       </Pitch>
-      {/* Action counts */}
-      <div className="mt-2 flex justify-center gap-3 text-xs text-gray-500">
-        {(Object.keys(ACTION_LABELS) as DefensiveActionType[]).map((type) => (
-          <span key={type} style={{ color: filters.has(type) ? ACTION_COLORS[type] : '#9ca3af' }}>
-            {actionCounts[type]}
-          </span>
-        ))}
+      {/* Stat summary */}
+      <div className="mt-2 text-center text-xs text-gray-500">
+        <span className="font-semibold text-gray-700">{totalActions}</span> defensive actions
       </div>
     </div>
   );
@@ -173,6 +257,12 @@ export function DefensiveActionsMap({
 }: DefensiveActionsMapProps) {
   const allTypes: DefensiveActionType[] = ['tackle', 'interception', 'recovery', 'clearance', 'block'];
   const [activeFilters, setActiveFilters] = useState<Set<DefensiveActionType>>(new Set(allTypes));
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    action: null,
+  });
 
   const toggleFilter = (type: DefensiveActionType) => {
     setActiveFilters((prev) => {
@@ -186,34 +276,59 @@ export function DefensiveActionsMap({
     });
   };
 
+  const handleHover = (action: DefensiveAction | null, x: number, y: number) => {
+    if (action) {
+      setTooltip({ visible: true, x, y, action });
+    } else {
+      setTooltip((prev) => ({ ...prev, visible: false }));
+    }
+  };
+
+  // Calculate totals for legend
+  const homeCounts = useMemo(() => {
+    const counts: Record<DefensiveActionType, number> = {
+      tackle: 0, interception: 0, recovery: 0, clearance: 0, block: 0,
+    };
+    for (const a of homeActions) counts[a.type]++;
+    return counts;
+  }, [homeActions]);
+
+  const awayCounts = useMemo(() => {
+    const counts: Record<DefensiveActionType, number> = {
+      tackle: 0, interception: 0, recovery: 0, clearance: 0, block: 0,
+    };
+    for (const a of awayActions) counts[a.type]++;
+    return counts;
+  }, [awayActions]);
+
   return (
     <div className={`pro-card p-5 ${className}`}>
-      <h3 className="section-title text-center mb-3">Defensive Actions</h3>
+      <h3 className="section-title text-center mb-4">Defensive Actions</h3>
 
-      {/* Filter toggles */}
-      <div className="flex flex-wrap justify-center gap-2 mb-4">
-        {allTypes.map((type) => (
-          <button
-            key={type}
-            onClick={() => toggleFilter(type)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-              activeFilters.has(type)
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-100 text-gray-400'
-            }`}
-          >
-            <span
-              className="w-2.5 h-2.5 rounded-full"
-              style={{
-                backgroundColor: activeFilters.has(type) ? ACTION_COLORS[type] : '#9ca3af',
-              }}
-            />
-            {ACTION_LABELS[type]}
-          </button>
-        ))}
+      {/* Filter pills */}
+      <div className="flex flex-wrap justify-center gap-2 mb-5">
+        {allTypes.map((type) => {
+          const isActive = activeFilters.has(type);
+          const total = homeCounts[type] + awayCounts[type];
+          return (
+            <button
+              key={type}
+              onClick={() => toggleFilter(type)}
+              className={`filter-pill ${isActive ? 'active' : ''}`}
+              aria-pressed={isActive}
+            >
+              <span
+                className="filter-indicator"
+                style={{ backgroundColor: GRADIENT_COLORS[type].dark }}
+              />
+              {ACTION_LABELS[type]}
+              <span className="count-badge">({total})</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Two-column layout for home/away */}
+      {/* Two-column pitch layout */}
       <div className="grid grid-cols-2 gap-4">
         <TeamDefensiveMap
           actions={homeActions}
@@ -221,6 +336,8 @@ export function DefensiveActionsMap({
           teamColor={homeColor}
           filters={activeFilters}
           isAway={false}
+          onHover={handleHover}
+          hoveredId={tooltip.action?.id ?? null}
         />
         <TeamDefensiveMap
           actions={awayActions}
@@ -228,20 +345,69 @@ export function DefensiveActionsMap({
           teamColor={awayColor}
           filters={activeFilters}
           isAway={true}
+          onHover={handleHover}
+          hoveredId={tooltip.action?.id ?? null}
         />
       </div>
 
-      {/* Legend */}
-      <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-        {allTypes.map((type) => (
-          <div key={type} className="flex items-center gap-1.5">
-            <svg width="12" height="12" viewBox="0 0 12 12">
-              <ActionMarker type={type} x={6} y={6} color={ACTION_COLORS[type]} size={4} />
-            </svg>
-            <span>{ACTION_LABELS[type]}</span>
-          </div>
-        ))}
+      {/* Glass-morphism legend */}
+      <div className="glass-legend p-4 mt-4">
+        <div className="grid grid-cols-5 gap-4">
+          {allTypes.map((type) => {
+            const homeCount = homeCounts[type];
+            const awayCount = awayCounts[type];
+            const isActive = activeFilters.has(type);
+            return (
+              <div
+                key={type}
+                className={`flex flex-col items-center transition-opacity ${isActive ? 'opacity-100' : 'opacity-40'}`}
+              >
+                <svg width="28" height="28" viewBox="0 0 28 28">
+                  <SvgDefs />
+                  <ActionMarker type={type} x={14} y={14} size={8} />
+                </svg>
+                <span className="text-[10px] text-gray-600 font-medium mt-1">
+                  {ACTION_LABELS[type]}
+                </span>
+                <div className="flex gap-2 mt-0.5">
+                  <span className="text-xs font-bold" style={{ color: homeColor }}>
+                    {homeCount}
+                  </span>
+                  <span className="text-[10px] text-gray-300">|</span>
+                  <span className="text-xs font-bold" style={{ color: awayColor }}>
+                    {awayCount}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Floating tooltip */}
+      {tooltip.visible && tooltip.action && (
+        <div
+          className="tooltip-floating"
+          style={{
+            left: tooltip.x,
+            top: tooltip.y - 12,
+            transform: 'translate(-50%, -100%)',
+          }}
+        >
+          <div className="tooltip-content">
+            <div className="font-semibold">{tooltip.action.playerName}</div>
+            <div className="text-gray-300 flex items-center gap-2">
+              <span>{tooltip.action.minute}'</span>
+              <span className="w-1 h-1 rounded-full bg-gray-500" />
+              <span>{ACTION_LABELS[tooltip.action.type]}</span>
+            </div>
+            {tooltip.action.outcome && (
+              <div className="text-[10px] text-gray-400 mt-0.5">{tooltip.action.outcome}</div>
+            )}
+          </div>
+          <div className="tooltip-connector" />
+        </div>
+      )}
     </div>
   );
 }
