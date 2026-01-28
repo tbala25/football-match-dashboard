@@ -208,26 +208,6 @@ export function MatchPageNew() {
             />
           )}
 
-          {/* Shot maps - side by side */}
-          {(homeShots.length > 0 || awayShots.length > 0) && (
-            <div className="pro-card p-5">
-              <h3 className="section-title text-center mb-4">Shot Maps</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <TeamShotMap
-                  shots={homeShots}
-                  teamColor={homeColor}
-                  teamName={homeTeamName}
-                  isAwayTeam={false}
-                />
-                <TeamShotMap
-                  shots={awayShots}
-                  teamColor={awayColor}
-                  teamName={awayTeamName}
-                  isAwayTeam={true}
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Right column - Away team pass network + lineup */}
@@ -250,6 +230,27 @@ export function MatchPageNew() {
           )}
         </div>
       </div>
+
+      {/* Shot maps - full width for better visibility */}
+      {(homeShots.length > 0 || awayShots.length > 0) && (
+        <div className="pro-card p-5 mt-4">
+          <h3 className="section-title text-center mb-4">Shot Maps</h3>
+          <div className="grid grid-cols-2 gap-6">
+            <TeamShotMap
+              shots={homeShots}
+              teamColor={homeColor}
+              teamName={homeTeamName}
+              isAwayTeam={false}
+            />
+            <TeamShotMap
+              shots={awayShots}
+              teamColor={awayColor}
+              teamName={awayTeamName}
+              isAwayTeam={true}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="mt-6 py-4 border-t text-xs text-gray-400 flex flex-wrap gap-4 justify-center">

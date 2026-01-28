@@ -191,7 +191,8 @@ export function getPlayerKeyEvents(
   for (const event of events) {
     if (event.player?.id !== playerId) continue;
 
-    if (event.type.name === 'Shot' && event.shot?.outcome.name === 'Goal') {
+    // Exclude penalty shootout goals (period 5)
+    if (event.type.name === 'Shot' && event.shot?.outcome.name === 'Goal' && event.period !== 5) {
       keyEvents.push({
         type: 'goal',
         minute: event.minute,

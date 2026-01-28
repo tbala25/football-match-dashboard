@@ -130,6 +130,7 @@ export interface RotatedViewportConfig {
   width: number;    // Viewport width
   height: number;   // Viewport height
   isAwayTeam?: boolean; // If true, flip for away team perspective
+  xMin?: number;    // Minimum x coordinate to show (default: 60 for half pitch)
 }
 
 /**
@@ -148,29 +149,29 @@ export interface RotatedViewportConfig {
  * - Original y (0-80) maps to viewport x (left to right)
  */
 export function createRotatedCoordinateMapper(config: RotatedViewportConfig): RotatedCoordinateMapper {
-  const { width, height, isAwayTeam = false } = config;
+  const { width, height, isAwayTeam = false, xMin = 60 } = config;
 
-  // We're mapping the attacking half: x from 60 to 120 (60 yard range)
-  // and y from 0 to 80 (full width)
-  const halfPitchLength = 60; // x: 60-120
+  // We're mapping the specified portion of the attacking half
+  // Default: x from 60 to 120 (60 yard range), can be cropped with xMin
+  const pitchLengthToShow = 120 - xMin; // e.g., 60 for full half, 40 for cropped
   const pitchWidth = STATSBOMB_PITCH.height; // y: 0-80
 
   // Scale factors
   const scaleX = width / pitchWidth; // Original y maps to viewport x
-  const scaleY = height / halfPitchLength; // Original x (60-120) maps to viewport y
+  const scaleY = height / pitchLengthToShow; // Original x maps to viewport y
 
   return {
     toViewport: (x: number, y: number) => {
       // Transform coordinates:
       // - Original y (0-80) -> Viewport x (0-width)
-      // - Original x (60-120) -> Viewport y (height to 0, goal at top)
+      // - Original x (xMin-120) -> Viewport y (height to 0, goal at top)
       //
       // StatsBomb normalizes ALL coordinates to "attacking right" (goal at x=120)
-      // Both home and away team shots are in the same coordinate system (x: 60-120)
+      // Both home and away team shots are in the same coordinate system
       // So both teams use identical transformations - no mirroring needed
 
       // Goal at x=120 should be at top (viewport y=0)
-      // Midfield at x=60 should be at bottom (viewport y=height)
+      // xMin should be at bottom (viewport y=height)
       const viewportX = y * scaleX;
       const viewportY = (120 - x) * scaleY;
 

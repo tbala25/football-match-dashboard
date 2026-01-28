@@ -21,20 +21,22 @@ export function TeamShotMap({
   isAwayTeam = false,
   className = '',
 }: TeamShotMapProps) {
-  // Viewport dimensions
-  const width = 200;
-  const height = 260;
-  const padding = { top: 20, right: 15, bottom: 40, left: 15 };
-  const pitchWidth = width - padding.left - padding.right;
-  const pitchHeight = height - padding.top - padding.bottom;
+  // Viewport dimensions - wider aspect ratio, cropped to attacking third (80 wide x 40 deep)
+  const viewBoxWidth = 440;
+  const viewBoxHeight = 260;
+  const padding = { top: 20, right: 20, bottom: 20, left: 20 };
+  const pitchWidth = viewBoxWidth - padding.left - padding.right;   // 400 for 80 yards width
+  const pitchHeight = viewBoxHeight - padding.top - padding.bottom; // 220 for 40 yards depth
 
-  // Create coordinate mapper
+  // Create coordinate mapper - cropped to show only attacking third (x: 80-120)
+  const xMin = 80; // Show from 40 yards out to goal (cuts off midfield)
   const mapper = useMemo(
     () =>
       createRotatedCoordinateMapper({
         width: pitchWidth,
         height: pitchHeight,
         isAwayTeam,
+        xMin,
       }),
     [pitchWidth, pitchHeight, isAwayTeam]
   );
@@ -50,8 +52,8 @@ export function TeamShotMap({
     };
   }, [shots]);
 
-  // Scale xG to circle radius
-  const xgToRadius = (xg: number) => Math.max(5, Math.min(18, 5 + xg * 25));
+  // Scale xG to circle radius (larger for bigger pitch view)
+  const xgToRadius = (xg: number) => Math.max(8, Math.min(30, 8 + xg * 40));
 
   // Convert half-pitch coordinates to rotated viewport
   const getPitchMarkings = () => {
@@ -110,8 +112,12 @@ export function TeamShotMap({
       </div>
 
       {/* Shot map */}
-      <div className="p-2">
-        <svg width={width} height={height} className="mx-auto">
+      <div className="p-3">
+        <svg
+          viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+          className="w-full h-auto"
+          preserveAspectRatio="xMidYMid meet"
+        >
           {/* Light background */}
           <rect
             x={padding.left}
@@ -128,40 +134,40 @@ export function TeamShotMap({
               x={markings.goal.x}
               y={0}
               width={markings.goal.width}
-              height={4}
+              height={6}
               fill="#333"
             />
 
             {/* End line */}
             <line
               x1={0}
-              y1={4}
+              y1={6}
               x2={pitchWidth}
-              y2={4}
+              y2={6}
               stroke="#999"
-              strokeWidth={1}
+              strokeWidth={2}
             />
 
             {/* 18-yard box (penalty area) */}
             <rect
               x={markings.penaltyArea.x}
-              y={4}
+              y={6}
               width={markings.penaltyArea.width}
               height={markings.penaltyArea.height}
               fill="none"
               stroke="#999"
-              strokeWidth={1}
+              strokeWidth={2}
             />
 
             {/* 6-yard box (goal area) */}
             <rect
               x={markings.goalArea.x}
-              y={4}
+              y={6}
               width={markings.goalArea.width}
               height={markings.goalArea.height}
               fill="none"
               stroke="#999"
-              strokeWidth={1}
+              strokeWidth={2}
             />
 
             {/* Shots */}
@@ -177,7 +183,7 @@ export function TeamShotMap({
                     r={r}
                     fill={shot.isGoal ? teamColor : 'transparent'}
                     stroke={teamColor}
-                    strokeWidth={2}
+                    strokeWidth={3}
                     opacity={0.8}
                   />
 
@@ -187,9 +193,9 @@ export function TeamShotMap({
                       x1={pos.x}
                       y1={pos.y}
                       x2={markings.goal.x + markings.goal.width / 2}
-                      y2={4}
+                      y2={6}
                       stroke={teamColor}
-                      strokeWidth={1.5}
+                      strokeWidth={2}
                       opacity={0.6}
                     />
                   )}
