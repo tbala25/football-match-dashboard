@@ -65,6 +65,24 @@ export function MatchPageNew() {
     return getXGSummary(events, homeTeamId, awayTeamId);
   }, [events, homeTeamId, awayTeamId]);
 
+  // Calculate penalty shootout scores (period 5)
+  const penaltyScores = useMemo(() => {
+    if (!events || !homeTeamId || !awayTeamId) return null;
+    const penaltyShots = events.filter(
+      (e) => e.period === 5 && e.type.name === 'Shot'
+    );
+    if (penaltyShots.length === 0) return null;
+
+    const homeGoals = penaltyShots.filter(
+      (e) => e.team.id === homeTeamId && e.shot?.outcome?.name === 'Goal'
+    ).length;
+    const awayGoals = penaltyShots.filter(
+      (e) => e.team.id === awayTeamId && e.shot?.outcome?.name === 'Goal'
+    ).length;
+
+    return { home: homeGoals, away: awayGoals };
+  }, [events, homeTeamId, awayTeamId]);
+
   if (!match) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -119,6 +137,12 @@ export function MatchPageNew() {
         match={match}
         homeXG={xgSummary?.home.xg}
         awayXG={xgSummary?.away.xg}
+        homeShots={xgSummary?.home.shots}
+        awayShots={xgSummary?.away.shots}
+        homeShotsOnTarget={xgSummary?.home.onTarget}
+        awayShotsOnTarget={xgSummary?.away.onTarget}
+        homePenaltyScore={penaltyScores?.home}
+        awayPenaltyScore={penaltyScores?.away}
         homeColor={homeColor}
         awayColor={awayColor}
         className="mb-4"
@@ -174,6 +198,7 @@ export function MatchPageNew() {
           {events && homeTeamId && awayTeamId && (
             <MatchStats
               events={events}
+              lineups={lineups}
               homeTeamId={homeTeamId}
               awayTeamId={awayTeamId}
               homeTeamName={homeTeamName}

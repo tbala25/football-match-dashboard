@@ -42,10 +42,10 @@ export function VerticalPassNetwork({
     return (count: number) => 1 + (count / maxCount) * 6;
   }, [data.links]);
 
-  // Calculate node size scale
+  // Calculate node size scale (reduced to 20% of original size for cleaner visualization)
   const nodeSizeScale = useMemo(() => {
     const maxPasses = Math.max(...data.nodes.map((n) => n.passCount), 1);
-    return (passes: number) => 12 + (passes / maxPasses) * 18;
+    return (passes: number) => 2.4 + (passes / maxPasses) * 3.6;
   }, [data.nodes]);
 
   // Lighten color for passes
@@ -154,7 +154,7 @@ export function VerticalPassNetwork({
             {data.nodes.map((node) => {
               const pos = transformCoord(node.avgX, node.avgY);
               const radius = nodeSizeScale(node.passCount);
-              const shortName = getShortName(node.name);
+              const shortName = getShortName(node.name, node.nickname);
 
               return (
                 <g key={node.playerId}>
@@ -193,7 +193,10 @@ export function VerticalPassNetwork({
   );
 }
 
-function getShortName(fullName: string): string {
+function getShortName(fullName: string, nickname?: string | null): string {
+  // Prefer nickname if available
+  if (nickname) return nickname;
+
   const parts = fullName.split(' ');
   if (parts.length === 1) return parts[0];
   return `${parts[0][0]}. ${parts[parts.length - 1]}`;

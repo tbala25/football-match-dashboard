@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import type { Event } from '../../types/statsbomb';
-import { getPassStats } from '../../lib/transformers';
+import type { Event, Lineup } from '../../types/statsbomb';
+import { getPassStats, getXGSummary } from '../../lib/transformers';
 
 interface MatchStatsProps {
   events: Event[];
+  lineups?: Lineup[];
   homeTeamId: number;
   awayTeamId: number;
   homeTeamName?: string;
@@ -19,11 +20,12 @@ interface StatRow {
   away: number;
   format?: 'number' | 'percent' | 'decimal';
   tooltip?: string;
-  category: 'possession' | 'attacking' | 'defending';
+  category: 'general' | 'possession' | 'attacking' | 'defending';
 }
 
 export function MatchStats({
   events,
+  lineups,
   homeTeamId,
   awayTeamId,
   homeTeamName = 'Home',
@@ -33,22 +35,28 @@ export function MatchStats({
   className = '',
 }: MatchStatsProps) {
   const stats = useMemo(() => {
-    const homePassStats = getPassStats(events, homeTeamId);
-    const awayPassStats = getPassStats(events, awayTeamId);
+    // Filter out penalty shootout events (period 5) for all stat calculations
+    const matchEvents = events.filter(e => e.period <= 4);
+
+    const homePassStats = getPassStats(matchEvents, homeTeamId);
+    const awayPassStats = getPassStats(matchEvents, awayTeamId);
+
+    // Get shots stats from xG summary (already excludes penalty shootout)
+    const xgSummary = getXGSummary(events, homeTeamId, awayTeamId);
 
     // Calculate various stats
     const countByType = (teamId: number, types: string[]) =>
-      events.filter(e => e.team?.id === teamId && types.includes(e.type.name)).length;
+      matchEvents.filter(e => e.team?.id === teamId && types.includes(e.type.name)).length;
 
     const getAvgPassDistance = (teamId: number) => {
-      const passes = events.filter(e => e.team?.id === teamId && e.type.name === 'Pass' && e.pass?.length);
+      const passes = matchEvents.filter(e => e.team?.id === teamId && e.type.name === 'Pass' && e.pass?.length);
       if (passes.length === 0) return 0;
       return passes.reduce((sum, p) => sum + (p.pass?.length ?? 0), 0) / passes.length;
     };
 
     // Progressive passes (passes that move ball forward significantly)
     const countProgressivePasses = (teamId: number) => {
-      return events.filter(e => {
+      return matchEvents.filter(e => {
         if (e.team?.id !== teamId || e.type.name !== 'Pass') return false;
         if (!e.location || !e.pass?.end_location) return false;
         const startX = e.location[0];
@@ -59,7 +67,7 @@ export function MatchStats({
 
     // Circulation (passes in own half)
     const countCirculation = (teamId: number) => {
-      const circulationPasses = events.filter(e => {
+      const circulationPasses = matchEvents.filter(e => {
         if (e.team?.id !== teamId || e.type.name !== 'Pass') return false;
         if (!e.location) return false;
         return e.location[0] < 60;
@@ -74,7 +82,7 @@ export function MatchStats({
       let currentPossession = -1;
       let passCount = 0;
 
-      for (const e of events) {
+      for (const e of matchEvents) {
         if (e.possession !== currentPossession) {
           if (passCount >= 5) buildUps++;
           currentPossession = e.possession;
@@ -89,7 +97,7 @@ export function MatchStats({
 
     // Fast breaks (quick counter attacks)
     const countFastBreaks = (teamId: number) => {
-      return events.filter(e => {
+      return matchEvents.filter(e => {
         if (e.team?.id !== teamId) return false;
         return e.play_pattern?.name === 'From Counter';
       }).length;
@@ -97,7 +105,7 @@ export function MatchStats({
 
     // High press (recoveries in attacking third)
     const countHighPress = (teamId: number) => {
-      return events.filter(e => {
+      return matchEvents.filter(e => {
         if (e.team?.id !== teamId) return false;
         if (!e.location) return false;
         if (!['Ball Recovery', 'Interception'].includes(e.type.name)) return false;
@@ -107,7 +115,7 @@ export function MatchStats({
 
     // Duels won
     const countDuelsWon = (teamId: number) => {
-      return events.filter(e => {
+      return matchEvents.filter(e => {
         if (e.team?.id !== teamId) return false;
         return e.type.name === 'Duel' && e.duel?.outcome?.name?.includes('Won');
       }).length;
@@ -115,14 +123,85 @@ export function MatchStats({
 
     // Aerial duels
     const countAerialDuels = (teamId: number) => {
-      return events.filter(e => {
+      return matchEvents.filter(e => {
         if (e.team?.id !== teamId) return false;
         return e.type.name === 'Duel' && e.duel?.type?.name === 'Aerial Lost' ||
                e.type.name === 'Miscontrol' && e.aerial_won;
       }).length;
     };
 
+    // Fouls committed
+    const countFouls = (teamId: number) =>
+      matchEvents.filter(e => e.team?.id === teamId && e.type.name === 'Foul Committed').length;
+
+    // Corner kicks
+    const countCorners = (teamId: number) =>
+      matchEvents.filter(
+        e => e.team?.id === teamId && e.type.name === 'Pass' && e.pass?.type?.name === 'Corner'
+      ).length;
+
+    // Cards from lineups data
+    const countCards = (teamId: number, cardType: 'yellow' | 'red') => {
+      if (!lineups) return 0;
+      const teamLineup = lineups.find(l => l.team_id === teamId);
+      if (!teamLineup) return 0;
+
+      return teamLineup.lineup.reduce((total, player) => {
+        if (cardType === 'yellow') {
+          return total + player.cards.filter(c => c.card_type === 'Yellow Card').length;
+        } else {
+          return total + player.cards.filter(c => c.card_type === 'Red Card' || c.card_type === 'Second Yellow').length;
+        }
+      }, 0);
+    };
+
+    // Saves: count shots by opposing team that were saved
+    const countSaves = (teamId: number) => {
+      const opponentTeamId = teamId === homeTeamId ? awayTeamId : homeTeamId;
+      return matchEvents.filter(e => {
+        if (e.team?.id !== opponentTeamId || e.type.name !== 'Shot') return false;
+        const outcome = e.shot?.outcome?.name;
+        return outcome === 'Saved' || outcome === 'Saved To Post';
+      }).length;
+    };
+
     const rows: StatRow[] = [
+      // General category
+      {
+        label: 'Fouls',
+        home: countFouls(homeTeamId),
+        away: countFouls(awayTeamId),
+        tooltip: 'Total fouls committed',
+        category: 'general',
+      },
+      {
+        label: 'Yellow Cards',
+        home: countCards(homeTeamId, 'yellow'),
+        away: countCards(awayTeamId, 'yellow'),
+        tooltip: 'Yellow cards received',
+        category: 'general',
+      },
+      {
+        label: 'Red Cards',
+        home: countCards(homeTeamId, 'red'),
+        away: countCards(awayTeamId, 'red'),
+        tooltip: 'Red cards received (including second yellows)',
+        category: 'general',
+      },
+      {
+        label: 'Corner Kicks',
+        home: countCorners(homeTeamId),
+        away: countCorners(awayTeamId),
+        tooltip: 'Corner kicks taken',
+        category: 'general',
+      },
+      {
+        label: 'Saves',
+        home: countSaves(homeTeamId),
+        away: countSaves(awayTeamId),
+        tooltip: 'Goalkeeper saves',
+        category: 'general',
+      },
       // Possession category
       {
         label: 'Pass Accuracy',
@@ -149,6 +228,20 @@ export function MatchStats({
         category: 'possession',
       },
       // Attacking category
+      {
+        label: 'Shots',
+        home: xgSummary.home.shots,
+        away: xgSummary.away.shots,
+        tooltip: 'Total shots',
+        category: 'attacking',
+      },
+      {
+        label: 'Shots on Target',
+        home: xgSummary.home.onTarget,
+        away: xgSummary.away.onTarget,
+        tooltip: 'Shots that would have scored without a save',
+        category: 'attacking',
+      },
       {
         label: 'Progressive Passes',
         home: countProgressivePasses(homeTeamId),
@@ -188,9 +281,10 @@ export function MatchStats({
     ];
 
     return rows;
-  }, [events, homeTeamId, awayTeamId]);
+  }, [events, lineups, homeTeamId, awayTeamId]);
 
   // Group stats by category
+  const generalStats = stats.filter(s => s.category === 'general');
   const possessionStats = stats.filter(s => s.category === 'possession');
   const attackingStats = stats.filter(s => s.category === 'attacking');
   const defendingStats = stats.filter(s => s.category === 'defending');
@@ -204,6 +298,9 @@ export function MatchStats({
         <span className="font-semibold text-sm" style={{ color: homeColor }}>{homeTeamName}</span>
         <span className="font-semibold text-sm" style={{ color: awayColor }}>{awayTeamName}</span>
       </div>
+
+      {/* General stats */}
+      <StatCategory title="General" stats={generalStats} homeColor={homeColor} awayColor={awayColor} />
 
       {/* Possession stats */}
       <StatCategory title="Possession" stats={possessionStats} homeColor={homeColor} awayColor={awayColor} />

@@ -195,7 +195,7 @@ function PlayerRow({ player, keyEvents, isSub, didNotPlay }: PlayerRowProps) {
 
       {/* Name */}
       <div className="flex-1 truncate text-xs">
-        {player.playerName}
+        {player.playerNickname || player.playerName}
       </div>
 
       {/* Minutes */}

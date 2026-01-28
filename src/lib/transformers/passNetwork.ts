@@ -3,6 +3,7 @@ import type { Event, PassNetworkData, PassNetworkNode, PassNetworkLink, Lineup }
 interface PlayerPassData {
   playerId: number;
   name: string;
+  nickname?: string | null;
   jerseyNumber?: number;
   locations: { x: number; y: number }[];
   passesTo: Map<number, { total: number; successful: number }>;
@@ -22,12 +23,14 @@ export function buildPassNetwork(
 ): PassNetworkData {
   const { minPasses = 3, includeUnsuccessful = false, periodFilter, maxPlayers = 11 } = options;
 
-  // Get lineup for the team to find jersey numbers
+  // Get lineup for the team to find jersey numbers and nicknames
   const teamLineup = lineups.find((l) => l.team_id === teamId);
   const jerseyNumbers = new Map<number, number>();
+  const nicknames = new Map<number, string | null>();
   if (teamLineup) {
     for (const player of teamLineup.lineup) {
       jerseyNumbers.set(player.player_id, player.jersey_number);
+      nicknames.set(player.player_id, player.player_nickname);
     }
   }
 
@@ -55,6 +58,7 @@ export function buildPassNetwork(
       playerData.set(playerId, {
         playerId,
         name: pass.player!.name,
+        nickname: nicknames.get(playerId),
         jerseyNumber: jerseyNumbers.get(playerId),
         locations: [],
         passesTo: new Map(),
@@ -67,6 +71,7 @@ export function buildPassNetwork(
       playerData.set(recipientId, {
         playerId: recipientId,
         name: pass.pass!.recipient!.name,
+        nickname: nicknames.get(recipientId),
         jerseyNumber: jerseyNumbers.get(recipientId),
         locations: [],
         passesTo: new Map(),
@@ -114,6 +119,7 @@ export function buildPassNetwork(
       allNodes.push({
         playerId: data.playerId,
         name: data.name,
+        nickname: data.nickname,
         avgX,
         avgY,
         passCount: data.totalPasses,

@@ -418,6 +418,7 @@ export interface FreezeFrame {
 export interface PassNetworkNode {
   playerId: number;
   name: string;
+  nickname?: string | null;
   avgX: number;
   avgY: number;
   passCount: number;
@@ -492,6 +493,7 @@ export interface PossessionPeriod {
 export interface PlayerMatchStats {
   playerId: number;
   playerName: string;
+  playerNickname?: string | null;
   teamId: number;
   jerseyNumber: number;
   position: string;

@@ -7,6 +7,12 @@ interface MatchHeaderProps {
   match: Match;
   homeXG?: number;
   awayXG?: number;
+  homeShots?: number;
+  awayShots?: number;
+  homeShotsOnTarget?: number;
+  awayShotsOnTarget?: number;
+  homePenaltyScore?: number;
+  awayPenaltyScore?: number;
   homeColor?: string;
   awayColor?: string;
   className?: string;
@@ -16,6 +22,12 @@ export function MatchHeaderNew({
   match,
   homeXG,
   awayXG,
+  homeShots,
+  awayShots,
+  homeShotsOnTarget,
+  awayShotsOnTarget,
+  homePenaltyScore,
+  awayPenaltyScore,
   homeColor = '#1e40af',
   awayColor = '#dc2626',
   className = ''
@@ -115,6 +127,11 @@ export function MatchHeaderNew({
               <span className="text-gray-300 text-4xl font-light">-</span>
               <span style={{ color: awayColor }}>{match.away_score}</span>
             </div>
+            {homePenaltyScore !== undefined && awayPenaltyScore !== undefined && (
+              <div className="text-sm text-gray-600 font-medium">
+                ({homePenaltyScore} - {awayPenaltyScore} pens)
+              </div>
+            )}
             <div className="text-sm text-gray-500">
               {formatDate(match.match_date)}
             </div>
@@ -157,6 +174,24 @@ export function MatchHeaderNew({
                   }}
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Shots stats */}
+        {homeShots !== undefined && awayShots !== undefined && (
+          <div className="mt-3 max-w-md mx-auto flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center gap-3">
+              <span>{homeShots} shots</span>
+              {homeShotsOnTarget !== undefined && (
+                <span className="text-gray-400">({homeShotsOnTarget} on target)</span>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              {awayShotsOnTarget !== undefined && (
+                <span className="text-gray-400">({awayShotsOnTarget} on target)</span>
+              )}
+              <span>{awayShots} shots</span>
             </div>
           </div>
         )}

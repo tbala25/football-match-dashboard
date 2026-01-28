@@ -1,5 +1,52 @@
 import type { Event, Lineup, PlayerMatchStats } from '../../types/statsbomb';
 
+// Get position from Starting XI tactics event (filtered by team)
+function getPositionFromTactics(events: Event[], playerId: number, teamId: number): string | undefined {
+  const tacticsEvent = events.find(
+    (e) => e.type.name === 'Starting XI' && e.tactics?.lineup && e.team.id === teamId
+  );
+  if (!tacticsEvent) return undefined;
+
+  const playerTactics = tacticsEvent.tactics!.lineup.find(
+    (p) => p.player.id === playerId
+  );
+  return playerTactics?.position?.name;
+}
+
+// Infer position from any event that has position data for this player
+function inferPositionFromEvents(events: Event[], playerId: number): string | undefined {
+  // Search all events for position data
+  const eventWithPosition = events.find(
+    (e) => e.player?.id === playerId && e.position?.name
+  );
+  if (eventWithPosition?.position?.name) {
+    return eventWithPosition.position.name;
+  }
+
+  // Also check pass recipient, shot freeze frame, etc.
+  for (const e of events) {
+    // Check if player appears in any freeze frame
+    if (e.shot?.freeze_frame) {
+      const ffPlayer = e.shot.freeze_frame.find((p) => p.player?.id === playerId);
+      if (ffPlayer?.position?.name) return ffPlayer.position.name;
+    }
+  }
+
+  return undefined;
+}
+
+// Infer position from jersey number as last resort
+function inferPositionFromJerseyNumber(jerseyNumber: number): string {
+  // Common jersey number conventions
+  if (jerseyNumber === 1) return 'Goalkeeper';
+  if (jerseyNumber >= 2 && jerseyNumber <= 5) return 'Center Back';
+  if (jerseyNumber >= 6 && jerseyNumber <= 8) return 'Center Midfield';
+  if (jerseyNumber === 9 || jerseyNumber === 11) return 'Striker';
+  if (jerseyNumber === 10) return 'Center Attacking Midfield';
+  if (jerseyNumber >= 12 && jerseyNumber <= 23) return 'Center Midfield'; // Typical sub range
+  return 'Center Midfield'; // Default fallback
+}
+
 export function buildPlayerStats(
   events: Event[],
   lineups: Lineup[],
@@ -35,12 +82,23 @@ export function buildPlayerStats(
       minutesPlayed += Math.max(0, to - from);
     }
 
+    // Get position with fallback chain: startPosition > subIn > tactics > event > jerseyNumber
+    const tacticsPosition = getPositionFromTactics(events, player.player_id, teamId);
+    const eventPosition = inferPositionFromEvents(events, player.player_id);
+    const jerseyPosition = inferPositionFromJerseyNumber(player.jersey_number);
+    const position = startPosition?.position
+      ?? subIn?.position
+      ?? tacticsPosition
+      ?? eventPosition
+      ?? jerseyPosition;
+
     stats.set(player.player_id, {
       playerId: player.player_id,
       playerName: player.player_name,
+      playerNickname: player.player_nickname,
       teamId,
       jerseyNumber: player.jersey_number,
-      position: startPosition?.position ?? subIn?.position ?? 'Unknown',
+      position,
       minutesPlayed: Math.min(minutesPlayed, 90),
       goals: 0,
       assists: 0,
