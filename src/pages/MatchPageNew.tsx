@@ -5,11 +5,22 @@ import { MatchHeaderNew } from '../components/match/MatchHeaderNew';
 import { LineupTable } from '../components/match/LineupTable';
 import { PossessionTimeline } from '../components/match/PossessionTimeline';
 import { MatchStats } from '../components/match/MatchStats';
+import { PassTypeBreakdown } from '../components/match/PassTypeBreakdown';
 import { VerticalPassNetwork } from '../components/pitch/VerticalPassNetwork';
 import { TerritoryMap } from '../components/pitch/TerritoryMap';
 import { TeamShotMap } from '../components/pitch/TeamShotMap';
+import { DefensiveActionsMap } from '../components/pitch/DefensiveActionsMap';
+import { CarryMap } from '../components/pitch/CarryMap';
 import { Loading, ErrorMessage, MatchPageSkeleton } from '../components/ui';
-import { buildPassNetwork, extractShots, getXGSummary } from '../lib/transformers';
+import {
+  buildPassNetwork,
+  extractShots,
+  getXGSummary,
+  extractDefensiveActions,
+  analyzePassTypes,
+  extractCarries,
+  extractDribbles,
+} from '../lib/transformers';
 import { getTeamColors } from '../lib/teamColors';
 import type { Match } from '../types/statsbomb';
 
@@ -64,6 +75,49 @@ export function MatchPageNew() {
     if (!events || !homeTeamId || !awayTeamId) return null;
     return getXGSummary(events, homeTeamId, awayTeamId);
   }, [events, homeTeamId, awayTeamId]);
+
+  // Defensive actions
+  const homeDefensiveActions = useMemo(() => {
+    if (!events || !homeTeamId) return [];
+    return extractDefensiveActions(events, homeTeamId);
+  }, [events, homeTeamId]);
+
+  const awayDefensiveActions = useMemo(() => {
+    if (!events || !awayTeamId) return [];
+    return extractDefensiveActions(events, awayTeamId);
+  }, [events, awayTeamId]);
+
+  // Pass types
+  const homePassTypes = useMemo(() => {
+    if (!events || !homeTeamId) return null;
+    return analyzePassTypes(events, homeTeamId);
+  }, [events, homeTeamId]);
+
+  const awayPassTypes = useMemo(() => {
+    if (!events || !awayTeamId) return null;
+    return analyzePassTypes(events, awayTeamId);
+  }, [events, awayTeamId]);
+
+  // Carries and dribbles
+  const homeCarries = useMemo(() => {
+    if (!events || !homeTeamId) return [];
+    return extractCarries(events, homeTeamId);
+  }, [events, homeTeamId]);
+
+  const awayCarries = useMemo(() => {
+    if (!events || !awayTeamId) return [];
+    return extractCarries(events, awayTeamId);
+  }, [events, awayTeamId]);
+
+  const homeDribbles = useMemo(() => {
+    if (!events || !homeTeamId) return [];
+    return extractDribbles(events, homeTeamId);
+  }, [events, homeTeamId]);
+
+  const awayDribbles = useMemo(() => {
+    if (!events || !awayTeamId) return [];
+    return extractDribbles(events, awayTeamId);
+  }, [events, awayTeamId]);
 
   // Calculate penalty shootout scores (period 5)
   const penaltyScores = useMemo(() => {
@@ -194,6 +248,18 @@ export function MatchPageNew() {
             />
           )}
 
+          {/* Pass type breakdown */}
+          {homePassTypes && awayPassTypes && (
+            <PassTypeBreakdown
+              homeData={homePassTypes}
+              awayData={awayPassTypes}
+              homeTeamName={homeTeamName}
+              awayTeamName={awayTeamName}
+              homeColor={homeColor}
+              awayColor={awayColor}
+            />
+          )}
+
           {/* Match stats */}
           {events && homeTeamId && awayTeamId && (
             <MatchStats
@@ -250,6 +316,34 @@ export function MatchPageNew() {
             />
           </div>
         </div>
+      )}
+
+      {/* Defensive actions map */}
+      {(homeDefensiveActions.length > 0 || awayDefensiveActions.length > 0) && (
+        <DefensiveActionsMap
+          homeActions={homeDefensiveActions}
+          awayActions={awayDefensiveActions}
+          homeTeamName={homeTeamName}
+          awayTeamName={awayTeamName}
+          homeColor={homeColor}
+          awayColor={awayColor}
+          className="mt-4"
+        />
+      )}
+
+      {/* Ball carries and dribbles map */}
+      {(homeCarries.length > 0 || awayCarries.length > 0) && (
+        <CarryMap
+          homeCarries={homeCarries}
+          awayCarries={awayCarries}
+          homeDribbles={homeDribbles}
+          awayDribbles={awayDribbles}
+          homeTeamName={homeTeamName}
+          awayTeamName={awayTeamName}
+          homeColor={homeColor}
+          awayColor={awayColor}
+          className="mt-4"
+        />
       )}
 
       {/* Legend */}
