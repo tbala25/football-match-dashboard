@@ -3,7 +3,6 @@ import type { ShotData } from '../../types/statsbomb';
 import {
   createRotatedCoordinateMapper,
   HALF_PITCH,
-  STATSBOMB_PITCH,
 } from '../../lib/coordinates';
 
 interface TeamShotMapProps {
@@ -61,13 +60,11 @@ export function TeamShotMap({
     const paTopLeft = mapper.toViewport(HALF_PITCH.penaltyAreaX, HALF_PITCH.penaltyAreaYMin);
     const paTopRight = mapper.toViewport(HALF_PITCH.penaltyAreaX, HALF_PITCH.penaltyAreaYMax);
     const paBottomLeft = mapper.toViewport(120, HALF_PITCH.penaltyAreaYMin);
-    const paBottomRight = mapper.toViewport(120, HALF_PITCH.penaltyAreaYMax);
 
     // Goal area
     const gaTopLeft = mapper.toViewport(HALF_PITCH.goalAreaX, HALF_PITCH.goalAreaYMin);
     const gaTopRight = mapper.toViewport(HALF_PITCH.goalAreaX, HALF_PITCH.goalAreaYMax);
     const gaBottomLeft = mapper.toViewport(120, HALF_PITCH.goalAreaYMin);
-    const gaBottomRight = mapper.toViewport(120, HALF_PITCH.goalAreaYMax);
 
     // Goal
     const goalLeft = mapper.toViewport(120, HALF_PITCH.goalYMin);

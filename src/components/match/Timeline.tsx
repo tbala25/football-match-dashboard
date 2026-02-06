@@ -184,7 +184,8 @@ function KeyEventsList({ xgTimeline, homeColor, awayColor }: KeyEventsListProps)
             className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${point.event?.isGoal ? 'ring-2 ring-offset-1' : ''}`}
             style={{
               backgroundColor: point.event?.team === 'home' ? homeColor : awayColor,
-              ringColor: point.event?.isGoal ? (point.event.team === 'home' ? homeColor : awayColor) : 'transparent'
+              // @ts-expect-error ringColor is a valid CSS custom property for Tailwind ring
+              '--tw-ring-color': point.event?.isGoal ? (point.event.team === 'home' ? homeColor : awayColor) : 'transparent'
             }}
           />
           <span className="flex-1 text-sm font-medium truncate">{point.event?.player}</span>
@@ -212,8 +213,8 @@ interface XGChartProps {
   awayColor: string;
 }
 
-function XGChart({ timeline, maxMinute, maxXG, homeTeamName, awayTeamName, homeColor, awayColor }: XGChartProps) {
-  const [hoveredPoint, setHoveredPoint] = useState<XGTimelinePoint | null>(null);
+function XGChart({ timeline, maxMinute, maxXG, homeTeamName: _homeTeamName, awayTeamName: _awayTeamName, homeColor, awayColor }: XGChartProps) {
+  const [_hoveredPoint, _setHoveredPoint] = useState<XGTimelinePoint | null>(null);
 
   const width = 100;
   const height = 50;

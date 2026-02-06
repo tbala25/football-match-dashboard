@@ -16,7 +16,7 @@ interface CenteredShotMapProps {
 export function CenteredShotMap({
   shots,
   homeTeamId,
-  awayTeamId,
+  awayTeamId: _awayTeamId,
   homeXG,
   awayXG,
   homeColor = '#EF0107',

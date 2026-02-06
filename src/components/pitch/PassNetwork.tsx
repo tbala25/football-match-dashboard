@@ -1,6 +1,6 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import * as d3 from 'd3';
-import type { PassNetworkData, PassNetworkNode, PassNetworkLink } from '../../types/statsbomb';
+import type { PassNetworkData } from '../../types/statsbomb';
 import { Pitch } from './Pitch';
 import type { CoordinateMapper } from '../../lib/coordinates';
 

@@ -183,20 +183,6 @@ function TeamDefensiveMap({
     return actions.filter((a) => filters.has(a.type));
   }, [actions, filters]);
 
-  const actionCounts = useMemo(() => {
-    const counts: Record<DefensiveActionType, number> = {
-      tackle: 0,
-      interception: 0,
-      recovery: 0,
-      clearance: 0,
-      block: 0,
-    };
-    for (const a of actions) {
-      counts[a.type]++;
-    }
-    return counts;
-  }, [actions]);
-
   const totalActions = actions.length;
 
   return (

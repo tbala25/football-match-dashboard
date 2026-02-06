@@ -23,7 +23,7 @@ export function extractShots(events: Event[]): ShotData[] {
 export function buildXGTimeline(
   events: Event[],
   homeTeamId: number,
-  awayTeamId: number
+  _awayTeamId: number
 ): XGTimelinePoint[] {
   const shots = extractShots(events).sort((a, b) => {
     const aMinute = a.minute + (a.period === 2 ? 45 : 0);

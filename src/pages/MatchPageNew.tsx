@@ -11,7 +11,7 @@ import { TerritoryMap } from '../components/pitch/TerritoryMap';
 import { TeamShotMap } from '../components/pitch/TeamShotMap';
 import { DefensiveActionsMap } from '../components/pitch/DefensiveActionsMap';
 import { CarryMap } from '../components/pitch/CarryMap';
-import { Loading, ErrorMessage, MatchPageSkeleton } from '../components/ui';
+import { ErrorMessage, MatchPageSkeleton } from '../components/ui';
 import {
   buildPassNetwork,
   extractShots,

@@ -13,7 +13,7 @@ interface VerticalPassNetworkProps {
 export function VerticalPassNetwork({
   data,
   teamColor = '#EF0107',
-  teamName = 'Team',
+  teamName: _teamName = 'Team',
   isAway = false,
   className = '',
 }: VerticalPassNetworkProps) {

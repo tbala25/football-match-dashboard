@@ -14,7 +14,7 @@ interface PassTypeBreakdownProps {
 const PASS_TYPE_ORDER: PassType[] = ['progressive', 'through_ball', 'cross', 'switch', 'long_ball'];
 
 function PassTypeBar({
-  label,
+  label: _label,
   count,
   successRate,
   maxCount,

@@ -16,7 +16,7 @@ interface ShotMapProps {
 export function ShotMap({
   shots,
   homeTeamId,
-  awayTeamId,
+  awayTeamId: _awayTeamId,
   homeColor = '#1e40af',
   awayColor = '#dc2626',
   className = '',

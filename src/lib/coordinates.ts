@@ -149,7 +149,7 @@ export interface RotatedViewportConfig {
  * - Original y (0-80) maps to viewport x (left to right)
  */
 export function createRotatedCoordinateMapper(config: RotatedViewportConfig): RotatedCoordinateMapper {
-  const { width, height, isAwayTeam = false, xMin = 60 } = config;
+  const { width, height, isAwayTeam: _isAwayTeam = false, xMin = 60 } = config;
 
   // We're mapping the specified portion of the attacking half
   // Default: x from 60 to 120 (60 yard range), can be cropped with xMin

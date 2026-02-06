@@ -80,7 +80,6 @@ export function buildPassNetwork(
     }
 
     const senderData = playerData.get(playerId)!;
-    const recipientData = playerData.get(recipientId)!;
 
     // Record pass START location only for positioning
     // Using end locations for recipients would bias their positions toward opponent's goal

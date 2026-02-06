@@ -44,10 +44,6 @@ export function MatchStats({
     // Get shots stats from xG summary (already excludes penalty shootout)
     const xgSummary = getXGSummary(events, homeTeamId, awayTeamId);
 
-    // Calculate various stats
-    const countByType = (teamId: number, types: string[]) =>
-      matchEvents.filter(e => e.team?.id === teamId && types.includes(e.type.name)).length;
-
     const getAvgPassDistance = (teamId: number) => {
       const passes = matchEvents.filter(e => e.team?.id === teamId && e.type.name === 'Pass' && e.pass?.length);
       if (passes.length === 0) return 0;
@@ -118,15 +114,6 @@ export function MatchStats({
       return matchEvents.filter(e => {
         if (e.team?.id !== teamId) return false;
         return e.type.name === 'Duel' && e.duel?.outcome?.name?.includes('Won');
-      }).length;
-    };
-
-    // Aerial duels
-    const countAerialDuels = (teamId: number) => {
-      return matchEvents.filter(e => {
-        if (e.team?.id !== teamId) return false;
-        return e.type.name === 'Duel' && e.duel?.type?.name === 'Aerial Lost' ||
-               e.type.name === 'Miscontrol' && e.aerial_won;
       }).length;
     };
 

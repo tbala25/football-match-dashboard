@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { useMatchData, useMatches } from '../lib/api';
+import { useMatchData } from '../lib/api';
 import { MatchHeader, Lineup, Timeline } from '../components/match';
 import { PassNetwork, ShotMap, Heatmap } from '../components/pitch';
 import { Tabs } from '../components/ui';
